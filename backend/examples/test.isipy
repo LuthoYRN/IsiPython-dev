@@ -1,3 +1,4 @@
+ukusuka math ngenisa sqrt
  # Testing comments
 
 chaza hlola(ixabiso):
@@ -11,13 +12,25 @@ chaza hlola(ixabiso):
         print("Ubuxoki")  # False
         buyisela ubuxoki
 
+#test1
 zama:
-    ngenisa math
-    print(math.sqrt(16))
+    hlola(sqrt(16))
 ngaphandle Exception:
-    print("Impazamo efunyenwe")
+    print("Impazamo")
 
-ngokulandelelana i ku range(3):
-    print(i)
+#test2
+ngokulandelelana i ku range(16):
+    ukuba i% 2 == 0 okanye i==5:
+        qhubeka
+    okanye_ukuba i>14:
+        yekisa
+    enye:
+        print(i)
 
-dlula  # Placeholder if block
+#test 3 
+x=0
+ngexesha hayi x==5:
+    print("Looping to 5...")
+    x+=1
+
+#done
