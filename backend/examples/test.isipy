@@ -1,0 +1,23 @@
+ # Testing comments
+
+chaza hlola(ixabiso):
+    ukuba ixabiso > 0:
+        print("Inyaniso")  # True
+        buyisela inyaniso
+    okanye_ukuba ixabiso == 0:
+        print("Akukho")  # None
+        buyisela akukho
+    enye:
+        print("Ubuxoki")  # False
+        buyisela ubuxoki
+
+zama:
+    ngenisa math
+    print(math.sqrt(16))
+ngaphandle Exception:
+    print("Impazamo efunyenwe")
+
+ngokulandelelana i ku range(3):
+    print(i)
+
+dlula  # Placeholder if block
