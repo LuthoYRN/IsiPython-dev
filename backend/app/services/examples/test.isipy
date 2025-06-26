@@ -20,7 +20,7 @@ ngaphandle Exception:
 
 #test2
 ngokulandelelana i ku range(16):
-    ukuba i% 2 == 0 okanye i==5:
+    ukuba ix% 2 == 0 okanye i==5:
         qhubeka
     okanye_ukuba i>14:
         yekisa
