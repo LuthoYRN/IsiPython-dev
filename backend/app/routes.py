@@ -17,7 +17,10 @@ def run_code():
 
         if error:
             translated = translate_error(error)
-            return jsonify({"output": None, "error": translated}), 400
+            if output:
+                return jsonify({'output': output, 'error': translated}),200
+            else:
+                return jsonify({"output": None, "error": translated}), 200
 
         return jsonify({"output": output, "error": None}), 200
 

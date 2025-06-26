@@ -1,4 +1,6 @@
 __pycache__/
 *.pyc
 temp.py
+env/
 .env
+examples/
