@@ -16,7 +16,7 @@ def run_code():
         output, error = execute_python(python_code)
 
         if error:
-            translated = translate_error(error)
+            translated = translate_error(error,original_code=isixhosa_code)
             if output:
                 return jsonify({'output': output, 'error': translated}),200
             else:
