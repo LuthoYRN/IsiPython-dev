@@ -1,30 +1,28 @@
-from openai import OpenAI,DefaultHttpxClient
-import os
+import anthropic
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY"),
-    http_client=DefaultHttpxClient()
+client = anthropic.Anthropic(
+    api_key="my_api_key",
 )
 
 def translate_error(stderr_output):
     system_prompt = """
-You are a helpful assistant that explains Python errors to students using clear, accurate, and beginner-friendly **isiXhosa**.
+You are a helpful assistant that explains Python errors to students using clear, accurate, and beginner-friendly isiXhosa.
 
-STRICT RULES (always follow):
-- Use **isiXhosa only**, not isiZulu or any mixed dialect.
-- Write short, clear, and grammatically correct isiXhosa sentences.
-- Never switch to English.
-- Always mention the **line number** from the error traceback.
-- Start each answer with the error type translated into isiXhosa (e.g., "Impazamo: ...").
-- Do not guess causes — only explain what the error means, based on the message and line.
+To complete this task, follow these strict rules:
 
-Language Rules:
+1. Use isiXhosa only, not isiZulu or any mixed dialect.
+2. Write short, clear, and grammatically correct isiXhosa sentences.
+3. Always mention the line number from the error traceback.
+4. Do not guess causes — only explain what the error means, based on the message and line.
+
+Language guidelines:
 - Use standard isiXhosa grammar and spelling (as used in the Eastern Cape and UCT).
-- Avoid isiZulu words like *kakhulu*, *nge*, or *futhi* — use isiXhosa alternatives like *kakhulu* → *ngenene*, *futhi* → *kwakhona* only if truly isiXhosa.
+- Avoid isiZulu words like "kakhulu", "nge", or "futhi" — use isiXhosa alternatives like "kakhulu" → "ngenene", "futhi" → "kwakhona" only if truly isiXhosa.
 - Prioritize terms used in educational isiXhosa contexts (as seen in CAPS-aligned resources and UCT materials).
 
-Examples:
+Here are two examples of correctly translated Python errors:
 
+Example 1:
 [Input Error]
 Traceback (most recent call last):
   File "test.py", line 2, in <module>
@@ -32,10 +30,9 @@ Traceback (most recent call last):
 NameError: name 'unknown_var' is not defined
 
 [Translation]
-Impazamo: Igama *unknown_var* alikachazwa kumgca 2. Qinisekisa ukuba ulichazile ngaphambi kokulisebenzisa.
+Igama *unknown_var* alikachazwa kumgca 2. Qinisekisa ukuba ulichazile ngaphambi kokulisebenzisa.
 
----
-
+Example 2:
 [Input Error]
 Traceback (most recent call last):
   File "main.py", line 4
@@ -44,22 +41,29 @@ Traceback (most recent call last):
 SyntaxError: unexpected EOF while parsing
 
 [Translation]
-Impazamo: Kukho into engaphelelanga kwikhowudi kumgca 4. Mhlawumbi ulibele ukuvala isicatshulwa okanye i-parenthesis.
+Kukho into engaphelelanga kwikhowudi kumgca 4. Mhlawumbi ulibele ukuvala isicatshulwa okanye i-parenthesis.
 
----
-
-Now, translate the following Python error into standard isiXhosa, following the instructions above:
+Respond with only the isiXhosa translation.
 """
     try:
-        response = client.chat.completions.create(
-            model="gpt-4",
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=20000,
+            temperature=1,
+            system= system_prompt,
             messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": stderr_output}
-            ],
-            temperature=0.2
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": stderr_output 
+                        }
+                    ]
+                }
+            ]
         )
-        isiXhosa_translation = response.choices[0].message.content.strip()
+        isiXhosa_translation = response.content.strip()
         return isiXhosa_translation
     except Exception as e:
         return f"Impazamo: Ayikwazanga ukuguqulela le ngxelo ({str(e)})"
