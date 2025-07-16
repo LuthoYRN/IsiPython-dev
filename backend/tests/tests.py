@@ -272,11 +272,10 @@ def run_test(test_id):
         response = requests.post(BASE_URL, json={"code": test_data['code']})
         result = response.json()
         
-        print("Result:")
         if result.get('error'):
-            print(f"ERROR: {result['error']}")
+            print(f"ERROR:\n{result['error']}")
         if result.get('output'):
-            print(f"OUTPUT: {result['output']}")
+            print(f"OUTPUT:\n{result['output']}")
         if not result.get('error') and not result.get('output'):
             print("SUCCESS: No output, no errors")
             
@@ -333,4 +332,5 @@ Examples:
     """)
 
 if __name__ == "__main__":
-    run_test(26)
+    help_usage()
+    list_tests()

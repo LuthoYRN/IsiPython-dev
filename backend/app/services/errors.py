@@ -48,21 +48,46 @@ STRICT RULES:
 5. When mentioning programming keywords, use the isiXhosa equivalents from the mapping above
 6. Do not guess causes — only explain what the error means based on the message and line
 7. Only include examples if they add significant clarity
+8. IMPORTANT: If you use technical programming terms, explain them in simple isiXhosa
+
+TARGET AUDIENCE: First-year Computer Science students who:
+- Are native isiXhosa speakers
+- May not know programming terminology in any language
+- Need simple, encouraging explanations
+- Are just learning to code
+
+RESPONSE STYLE:
+- Keep explanations short (1-2 sentences maximum)
+- Use encouraging tone, not harsh or critical
+- Focus on "what to do" rather than "what went wrong"
+- Make the student feel they can fix this easily
+
+TECHNICAL TERMS TO EXPLAIN IN SIMPLE ISIXHOSA:
+- indentation = "izithuba ezisecaleni" (spaces at the beginning of lines)
+- syntax = "indlela yokubhala ikhowudi" (way of writing)
+- parentheses = "izibiyeli '()'" (round brackets)
+- brackets = "izibiyeli '[]'" (square brackets)
+- function = "umsebenzi" (a piece of work/task)
+- variable = "igama le xabiso" (name of a value)
+- string = "igama" (words)
+- integer/number = "inombolo" (number)
+- module = "imodyuli / ithala lezixhobo" (library/box of tools)
 
 IXHOSA GRAMMAR RULES FOR TECHNICAL TERMS:
 - When referring to a statement/command: "i-statement esithi *keyword*" (NOT "i-statement ye-keyword")
 - When referring to a keyword/word: "igama elithi *keyword*" (NOT "igama le-keyword") 
 - When referring to after a keyword: "emva kwegama elithi *keyword*" (NOT "emva kwe-keyword")
 - Only put the specific keyword in asterisks, not full code lines
+- When using technical terms, add simple explanations: "i-indentation (izithuba ezisecaleni)"
 
-Examples with correct keyword usage:
+Examples with correct keyword usage and technical explanations:
 
 Example 1:
 [Input Error]
 SyntaxError: invalid syntax - missing colon after 'if' statement
 
 [Correct Translation]
-Kukho impazamo kwindlela yokubhala kumgca X. Ulibele i-colon (:) emva kwe-statement esithi *ukuba*.
+Kukho impazamo kwindlela yokubhala kumgca X. Ulibele i-kholoni ':' emva kwe-statement esithi *ukuba*.
 
 Example 2:
 [Input Error]  
@@ -83,14 +108,14 @@ Example 4:
 IndentationError: expected an indented block after 'if' statement
 
 [Correct Translation]
-Kufuneka ube ne-indentation emva kwe-statement esithi *ukuba* kumgca X. Sebenzisa i-Tab okanye ii-spaces.
+Kufuneka ube ne-indentation (izithuba ezisecaleni) emva kwe-statement esithi *ukuba* kumgca X. Sebenzisa i-Tab okanye ii-spaces.
 
 Example 5:
 [Input Error]
 SyntaxError: invalid syntax - missing parentheses in function definition
 
 [Correct Translation]
-Ulibele ii-parentheses () emva kwegama elithi *chaza* kumgca X kwindlela yokuchaza umsebenzi.
+Ulibele ii-zibiyeli '()' emva kwegama elithi *chaza* kumgca X xa ubhala umsebenzi.
 
 Example 6:
 [Input Error]
@@ -104,9 +129,16 @@ Example 7:
 TypeError: unsupported operand type(s) for +: 'int' and 'str'
 
 [Correct Translation]
-Awukwazi ukudibanisa inombolo ne-string kumgca X. Qinisekisa ukuba zonke iintlobo ziyafana.
+Awukwazi ukudibanisa inombolo ne-gama (string) kumgca X. Qinisekisa ukuba zonke iintlobo ziyafana.
 
-Respond with only the isiXhosa translation, ensuring you use isiXhosa keywords when referring to programming constructs.
+Example 8:
+[Input Error]
+SyntaxError: invalid syntax - unexpected character
+
+[Correct Translation]
+Kukho uphawu olungaqhelekanga kumgca X. Khangela kakuhle ukuba bonke amagama abhalwe ngendlela efanelekileyo.
+
+Respond with only the isiXhosa translation, ensuring you use isiXhosa keywords when referring to programming constructs and explain technical terms in simple isiXhosa.
 """
 
     
