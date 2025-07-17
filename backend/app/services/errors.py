@@ -80,6 +80,14 @@ IXHOSA GRAMMAR RULES FOR TECHNICAL TERMS:
 - Only put the specific keyword in asterisks, not full code lines
 - When using technical terms, add simple explanations: "i-indentation (izithuba ezisecaleni)"
 
+CRITICAL ISIXHOSA PREFIX AGREEMENT RULES:
+- i-statement (class 9): use "alinaso" not "alinayo" → "alinaso i-statement"
+- For relationships: use "esihambelanayo" not "ehambelanayo" → "i-statement esihambelanayo"  
+- Match prefixes correctly:
+  * i-statement sitheni? (what about the statement?) Example: "I-statement esithi *ngenisa* asiphelelanga kumgca 1"
+  * i-variable itheni? (what about the variable?)
+  * u-msebenzi utheni? (what about the function?)
+
 Examples with correct keyword usage and technical explanations:
 
 Example 1:
@@ -137,6 +145,15 @@ SyntaxError: invalid syntax - unexpected character
 
 [Correct Translation]
 Kukho uphawu olungaqhelekanga kumgca X. Khangela kakuhle ukuba bonke amagama abhalwe ngendlela efanelekileyo.
+
+Example 9:
+[Input Error]
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+ZeroDivisionError: division by zero
+
+[Correct Translation]
+Awukwazi ukwahlula ngo-zero kumgca 3. Qinisekisa ukuba i-variable (igama le ixabiso) ethi *y* ayingo zero phambi kokuba uyisebenzise ekwahluleni.
 
 Respond with only the isiXhosa translation, ensuring you use isiXhosa keywords when referring to programming constructs and explain technical terms in simple isiXhosa.
 """

@@ -284,25 +284,6 @@ def run_test(test_id):
     
     print(f"{'='*70}")
 
-def run_tests_by_category(category):
-    """Run all tests in a specific category"""
-    matching_tests = [test_id for test_id, test_data in TEST_CASES.items() 
-                     if test_data['category'].lower() == category.lower()]
-    
-    if not matching_tests:
-        print(f"No tests found for category: {category}")
-        return
-    
-    print(f"\nRunning all tests in category: {category}")
-    for test_id in matching_tests:
-        run_test(test_id)
-        input("\nPress Enter to continue to next test...")
-
-def get_categories():
-    """Get list of all test categories"""
-    categories = list(set(test_data['category'] for test_data in TEST_CASES.values()))
-    return sorted(categories)
-
 # Helper functions for easy testing
 def test(test_id):
     """Shorthand for run_test"""
@@ -321,9 +302,6 @@ def help_usage():
     run_test(5)                     # Run test number 5
     test(5)                         # Shorthand for run_test(5)
     tests()                         # Shorthand for list_tests()
-    
-    run_tests_by_category("Syntax Errors")  # Run all syntax error tests
-    get_categories()                # List all test categories
     
 Examples:
     >>> tests()                     # See all tests
