@@ -229,7 +229,29 @@ product_result = multiply(num1, num2)
 
 print("Sum:", sum_result)
 print("Product:", product_result)"""
-    }
+    },
+27: {
+        "name": "Infinite loop test",
+        "category": "Infinite Loop",
+        "code": """# Infinite loop
+num1 = 1
+ngexesha num1 == 1 :
+    num1 =1
+print(num)"""
+    },
+28: {
+        "name": "Taking input test",
+        "category": "Input",
+        "code": """
+num1 = input("Enter a number: ")
+ukuba num1 > 0:
+    print(num1, "is positive")
+enye num1 < 0:
+    print(num1, "is negative")
+enye:
+    print(num1, "is zero")
+"""
+    }, 
 }
 
 def list_tests():
