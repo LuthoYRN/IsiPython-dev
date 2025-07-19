@@ -252,6 +252,16 @@ enye:
     print(num1, "is zero")
 """
     }, 
+    29: {
+        "name": "Partial working code",
+        "category": "Partial Working Code",
+        "code": """
+ngokulandelelana i ku range(5):
+    print(i)
+i = None
+print(i+1)
+"""
+    }, 
 }
 
 def list_tests():
@@ -293,11 +303,11 @@ def run_test(test_id):
     try:
         response = requests.post(BASE_URL, json={"code": test_data['code']})
         result = response.json()
-        
-        if result.get('error'):
-            print(f"ERROR:\n{result['error']}")
+    
         if result.get('output'):
             print(f"OUTPUT:\n{result['output']}")
+        if result.get('error'):
+            print(f"ERROR:\n{result['error']}")
         if not result.get('error') and not result.get('output'):
             print("SUCCESS: No output, no errors")
             
