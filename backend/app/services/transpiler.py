@@ -53,7 +53,9 @@ def transpile_code(source_code: str) -> str:
         else:
             result.append(_substitute_keywords(line))
 
-    return "\n".join(result)
+    transpiled_code = "\n".join(result)
+    final_code = _convert_input_calls(transpiled_code)
+    return final_code
 
 def _substitute_keywords(line: str) -> str:
     """Helper: substitute keywords only in code, not comments."""
@@ -61,3 +63,39 @@ def _substitute_keywords(line: str) -> str:
         if py_kw is not None:
             line = re.sub(rf'\b{xhosa_kw}\b', py_kw, line)
     return line
+
+def _convert_input_calls(code: str) -> str:
+    """
+    Convert input("prompt") calls to print("prompt") + input("")
+    Preserves indentation and handles complex cases
+    """
+    import re
+    
+    lines = code.split('\n')
+    result_lines = []
+    
+    for line in lines:
+        # Check if this line contains input() with a prompt
+        input_match = re.search(r'input\s*\(\s*(["\'])(.*?)\1\s*\)', line)
+        
+        if input_match:
+            quote_char = input_match.group(1)
+            prompt_text = input_match.group(2)
+            
+            # Get the indentation of the current line
+            indentation = len(line) - len(line.lstrip())
+            indent_str = line[:indentation]
+            
+            # Create the print statement with same indentation
+            print_line = f'{indent_str}print({quote_char}{prompt_text}{quote_char})'
+            
+            # Replace input("prompt") with input("") in the original line
+            new_line = line.replace(f'input({quote_char}{prompt_text}{quote_char})', 'input("")')
+            
+            # Add both lines
+            result_lines.append(print_line)
+            result_lines.append(new_line)
+        else:
+            result_lines.append(line)
+    
+    return '\n'.join(result_lines)

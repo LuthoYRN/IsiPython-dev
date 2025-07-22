@@ -10,19 +10,19 @@ main = Blueprint('main', __name__)
 def run_code():
     data = request.get_json()
     isixhosa_code = data.get('code')
+    session_id = data.get('session_id')  # Optional
+    user_input = data.get('input')       # Optional
 
     try:
-        python_code = transpile_code(isixhosa_code)
-        output, error = execute_python(python_code)
+        if session_id:
+            result = execute_python("", session_id, user_input)
+        else:
+            python_code = transpile_code(isixhosa_code)
+            result = execute_python(python_code, session_id, user_input)
 
-        if error:
-            translated = translate_error(error,original_code=isixhosa_code)
-            if output:
-                return jsonify({'output': output, 'error': translated}),200
-            else:
-                return jsonify({"output": None, "error": translated}), 200
-
-        return jsonify({"output": output, "error": None}), 200
+        if result.get("error"):
+            result['error'] = translate_error(result['error'])
+        return jsonify(result), 200
 
     except Exception as e:
-        return jsonify({"output": None, "error": str(e)}), 500
+        return jsonify({"output": None, "error": str(e), "completed": True}), 500
