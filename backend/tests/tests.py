@@ -268,8 +268,28 @@ ngokulandelelana i ku range(5):
     print(i)
 i = None
 print(i+1)
-"""
-    }, 
+"""},
+29: {
+        "name": "Edge case for input/infinite loop detection",
+        "category": "Input/Infinite loop",
+        "code": """
+ngokulandelelana i ku range(100000):
+    print(i) 
+"""},
+30: {
+        "name": "Edge case for input/infinite loop detection",
+        "category": "Input/Infinite loop",
+        "code": """
+ngexesha inyaniso:
+    print(i)
+"""},
+31: {
+        "name": "Edge case for input/infinite loop detection",
+        "category": "Input/Infinite loop",
+        "code": """
+ngokulandelelana i ku range(100000):
+    dlula 
+"""},
 }
 
 def list_tests():

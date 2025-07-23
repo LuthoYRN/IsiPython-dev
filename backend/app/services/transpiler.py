@@ -1,9 +1,9 @@
 import re
 
 KEYWORD_MAP = {
-    "ubuxoki": "False",            # Means "falsehood"
-    "inyaniso": "True",            # Means "truth"
-    "akukho": "None",              # Means "nothing"
+    "Ubuxoki": "False",            # Means "falsehood"
+    "Inyaniso": "True",            # Means "truth"
+    "Akukho": "None",              # Means "nothing"
     "kwaye": "and",                # Logical AND
     "njenga": "as",                # Used in aliasing
     "qinisekisa": "assert",        # Ensure/verify
@@ -88,7 +88,6 @@ def _convert_input_calls(code: str) -> str:
             
             # Create the print statement with same indentation
             print_line = f'{indent_str}print({quote_char}{prompt_text}{quote_char})'
-            
             # Replace input("prompt") with input("") in the original line
             new_line = line.replace(f'input({quote_char}{prompt_text}{quote_char})', 'input("")')
             

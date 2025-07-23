@@ -23,9 +23,9 @@ KEYWORD MAPPINGS (Python → isiXhosa):
 - and → kwaye
 - or → okanye
 - not → hayi
-- True → inyaniso
-- False → ubuxoki
-- None → akukho
+- True → Inyaniso
+- False → Ubuxoki
+- None → Akukho
 - break → yekisa
 - continue → qhubeka
 - return → buyisela
