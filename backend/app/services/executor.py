@@ -13,22 +13,24 @@ class ExecutionSession:
         self.session_id = session_id
         self.process: Optional[subprocess.Popen] = None
         self.input_queue = queue.Queue()
+        self.current_prompt = ""
         self.output_lines = []
         self.error_lines = []
         self.is_waiting_for_input = False
         self.is_complete = False
         self.start_time = time.time()
-        self.last_output_time = time.time()  
+        self.last_output_time = time.time()
+        self.last_resume = time.time()  
         self.output_thread = None              
         self.error_thread = None               
-        self.stop_monitoring = False           
+        self.stop_monitoring = False   
+        self.code = ""        
         
 # Global dictionary to store active sessions
 active_sessions: Dict[str, ExecutionSession] = {}
 
 def execute_python(code: str, session_id: Optional[str] = None, 
-                             user_input: Optional[str] = None,
-                             prompts: Optional[list] = None) -> Dict[str, Any]:
+                             user_input: Optional[str] = None) -> Dict[str, Any]:
     """
     Executor that can handle interactive input.
     """
@@ -51,6 +53,9 @@ def _start_output_monitoring(session: ExecutionSession):
                 line = session.process.stdout.readline()
                 if line:
                     clean_line = line.rstrip('\n')
+                    if line.startswith(">>>"): #for input prompts
+                        clean_line = clean_line[3:]
+                        session.current_prompt = clean_line
                     session.output_lines.append(clean_line)
                     session.last_output_time = time.time()
                     print(f"[DEBUG] Captured stdout: '{clean_line}'")
@@ -87,6 +92,7 @@ def _start_new_execution(code: str) -> Dict[str, Any]:
     
     session_id = str(uuid.uuid4())
     session = ExecutionSession(session_id)
+    session.code = code
     
     temp_file = f"temp_{session_id}.py"
     try:
@@ -128,14 +134,15 @@ def _check_execution_status(session: ExecutionSession) -> Dict[str, Any]:
     # Check if we're waiting for input
     if _is_waiting_for_input(session):
         session.is_waiting_for_input = True
-        prompt = _extract_input_prompt(session)
         return {
             "session_id": session.session_id,
             "waiting_for_input": True,
-            "prompt": prompt,
+            "prompt": session.current_prompt,
             "output": "\n".join(session.output_lines) if session.output_lines else None
         }
-    
+    # Check for infinite loop
+    if _detect_infinite_loop(session):
+        return _handle_infinite_loop(session)
     # Still running but not waiting for input yet
     # Return current output and keep session alive
     return {
@@ -146,54 +153,51 @@ def _check_execution_status(session: ExecutionSession) -> Dict[str, Any]:
     }
 
 def _is_waiting_for_input(session: ExecutionSession) -> bool:
-    """
-    Detect input waiting by process behavior rather than prompt capture
-    """
     if not session.process or session.process.poll() is not None:
         return False
     
-    current_time = time.time()
-    time_since_start = current_time - session.start_time
-    time_since_last_output = current_time - session.last_output_time
-    
-    print(f"[DEBUG] Time since start: {time_since_start:.2f}s, since last output: {time_since_last_output:.2f}s")
-    print(f"[DEBUG] Output lines: {session.output_lines}")
-    
-    # Process needs to be running for a bit
-    if time_since_start < 0.8:
-        return False
-    
-    # Check if process appears to be blocked/idle
-    # If we haven't gotten any output for a while, and the process is still running,
-    # it's likely waiting for input
-    
-    # Case 1: We have some output already, but nothing recent
-    if len(session.output_lines) > 0 and time_since_last_output > 1.0:
-        print("[DEBUG] Detected: Has output but no recent activity - likely waiting for input")
+    if session.current_prompt and session.output_lines[-1]==session.current_prompt:
+        print(f"[DEBUG] Detected input prompt: {session.current_prompt}")
         return True
+  
+    return False
+
+def _detect_infinite_loop(session: ExecutionSession) -> bool:
+    """Only called when we're NOT waiting for input"""
+    time_running = time.time() - session.last_resume
     
-    # Case 2: No output at all, but process has been running for a while
-    # This happens when input() is the first statement
-    if len(session.output_lines) == 0 and len(session.error_lines) == 0 and time_since_start > 1.5:
-        print("[DEBUG] Detected: No output but process running - likely waiting for input")
+    if time_running > 30:  # 30 seconds without input prompt
+        print(f"[DEBUG] Long running/slow/possible infinite loop detected: {time_running:.1f}s")
         return True
     
     return False
- 
-def _extract_input_prompt(session: ExecutionSession) -> str:
-    """Extract input prompt"""
+
+def _handle_infinite_loop(session: ExecutionSession) -> Dict[str, Any]:
+    """Handle long running code/ possible infinite loop by killing process and cleaning up"""
+    print(f"[DEBUG] Killing long running process PID: {session.process.pid}")
     
-    # If we have output lines, try to find a prompt-like line
-    if session.output_lines:
-        # Check the last few lines for something that looks like a prompt
-        for line in reversed(session.output_lines[-3:]):  # Check last 3 lines
-            line = line.strip()
-            if line and (line.endswith('?') or 
-                        'enter' in line.lower() or 'input' in line.lower()):
-                return line
-        
-        # If no obvious prompt, return the last line
-        return session.output_lines[-1].strip()
+    # Kill the process
+    session.process.kill()
+    
+    # Clean up
+    temp_file = f"temp_{session.session_id}.py"
+    if os.path.exists(temp_file):
+        try:
+            os.remove(temp_file)
+        except Exception:
+            pass
+    
+    # Remove from active sessions
+    if session.session_id in active_sessions:
+        del active_sessions[session.session_id]
+    
+    return {
+        "session_id": session.session_id,
+        "output": "\n".join(session.output_lines) if session.output_lines else None,
+        "error": "[Timeout]",
+        "code":session.code,
+        "completed": True
+    }
 
 def _continue_session_with_input(session_id: str, user_input: str) -> Dict[str, Any]:
     """Continue an existing session by providing input"""
@@ -209,6 +213,8 @@ def _continue_session_with_input(session_id: str, user_input: str) -> Dict[str, 
         # Write the input to the process
         session.process.stdin.write(user_input + '\n')
         session.process.stdin.flush()
+        session.last_resume = time.time()
+        session.current_prompt = ""
         print(f"[DEBUG] Sent input to process: '{user_input}'")
         
         # Give the process time to handle the input and potentially produce more output
