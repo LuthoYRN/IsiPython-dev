@@ -2,10 +2,6 @@ flask==3.0.3
 flask-cors==4.0.0
 python-dotenv==1.0.1
 requests==2.31.0
-<<<<<<< HEAD
 anthropic==0.34.0
 sqlalchemy==2.0.25
 alembic==1.13.1
-=======
-anthropic==0.34.0
->>>>>>> 07ecebcb8638708f5421186a9df8f241feef49e3
