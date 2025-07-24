@@ -230,16 +230,7 @@ product_result = multiply(num1, num2)
 print("Sum:", sum_result)
 print("Product:", product_result)"""
     },
-27: {
-        "name": "Infinite loop test",
-        "category": "Infinite Loop",
-        "code": """# Infinite loop
-num1 = 1
-ngexesha num1 == 1 :
-    num1 =1
-print(num)"""
-    },
-28: {
+    27: {
         "name": "Taking input test",
         "category": "Input",
         "code": """ngenisa time
@@ -260,7 +251,7 @@ enye:
         print(y, "is equal to both numbers")
 """
     }, 
-    29: {
+28: {
         "name": "Partial working code",
         "category": "Partial Working Code",
         "code": """
@@ -270,20 +261,144 @@ i = None
 print(i+1)
 """},
 29: {
+    "name": "While True without break",
+    "category": "Infinite Loop",
+    "code": """# While True infinite loop
+ngexesha Inyaniso:
+    print("This")
+"""
+},
+30: {
+    "name": "Counter never increments",
+    "category": "Infinite Loop", 
+    "code": """# Counter that never changes
+i = 0
+ngexesha i < 10:
+    print("Count is:", i)
+"""
+},
+31: {
+    "name": "Wrong increment direction",
+    "category": "Infinite Loop",
+    "code": """# Counter going wrong direction
+x = 10
+ngexesha x > 0:
+    print("Counting down:", x)
+    x = x + 1"""
+},
+32: {
+    "name": "Nested infinite loops",
+    "category": "Infinite Loop",
+    "code": """# Nested loops that never end
+i = 0
+ngexesha i < 5:
+    j = 0
+    ngexesha j < 3:
+        print(i, j)
+    i = i + 1"""
+},
+33: {
+    "name": "Condition never changes",
+    "category": "Infinite Loop",
+    "code": """# Variable in condition never modified
+ready = Ubuxoki
+ngexesha hayi ready:
+    print("Waiting...")
+"""
+},
+34: {
+    "name": "Infinite recursion",
+    "category": "Infinite Loop", 
+    "code": """# Recursive function without base case
+chaza countdown(n):
+    print(n)
+    countdown(n - 1)
+
+countdown(5)"""
+}
+,
+35: {
+    "name": "For loop with crazy range",
+    "category": "Infinite Loop",
+    "code": """# For loop that creates infinite iteration
+ngokulandelelana i ku range(1, 100000000):
+    print("Processing:", i)
+"""
+},
+36: {
+    "name": "Infinite loop with break in wrong place",
+    "category": "Infinite Loop",
+    "code": """# Break statement that never executes
+count = 0
+ngexesha Inyaniso:
+    print("Running...")
+    ukuba count == 10:
+        yekisa
+"""
+},
+37: {
+    "name": "String processing infinite loop",
+    "category": "Infinite Loop", 
+    "code": """# String that never gets shorter
+text = "hello world"
+ngexesha len(text) > 0:
+    print("Processing:", text)
+    text = text + "!"
+"""
+},
+38: {
+    "name": "Mathematical infinite loop",
+    "category": "Infinite Loop",
+    "code": """# Mathematical condition that never changes
+num = 4
+ngexesha num % 2 == 0:  # num is even
+    print("Number is even:", num)
+    num = num * 2
+"""
+},
+39: {
+    "name": "Infinite loop with multiple conditions",
+    "category": "Infinite Loop",
+    "code": """# Multiple conditions, one never changes
+a = 5
+b = 3
+ngexesha a > 0 okanye b > 0:
+    print("Both positive")
+    a = a - 1
+"""
+},
+40: {
+    "name": "Complex slow computation",
+    "category": "Slow Code",
+    "code": """# Computationally expensive operation
+total = 0
+ngokulandelelana i ku range(1000000):
+    ngokulandelelana j ku range(1000):
+        total = total + (i * j)
+print("Total:", total)"""
+},
+41: {
+    "name": "Slow algorithm - bubble sort",
+    "category": "Slow Code",
+    "code": """# Inefficient bubble sort on large list
+numbers = list(range(10000, 0, -1))  # Large reverse list
+ngokulandelelana i ku range(len(numbers)):
+    ngokulandelelana j ku range(len(numbers) - 1):
+        ukuba numbers[j] > numbers[j + 1]:
+            temp = numbers[j]
+            numbers[j] = numbers[j + 1] 
+            numbers[j + 1] = temp
+print("Sorted!")"""
+}
+,
+42: {
         "name": "Edge case for input/infinite loop detection",
         "category": "Input/Infinite loop",
         "code": """
 ngokulandelelana i ku range(100000):
     print(i) 
 """},
-30: {
-        "name": "Edge case for input/infinite loop detection",
-        "category": "Input/Infinite loop",
-        "code": """
-ngexesha inyaniso:
-    print(i)
-"""},
-31: {
+43: {
         "name": "Edge case for input/infinite loop detection",
         "category": "Input/Infinite loop",
         "code": """
