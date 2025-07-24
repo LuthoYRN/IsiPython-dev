@@ -215,14 +215,12 @@ KEYWORD MAPPINGS (Python → isiXhosa):
 - raise → phakamisa
 - in → ku
 - is → ngu
-- input → faka/ngenisa
-- print → printa/bonisa
 
 STRICT RULES:
 1. Use isiXhosa only, not isiZulu or any mixed dialect
 2. Write short, clear, and grammatically correct isiXhosa sentences
 3. Never switch to English
-4. Always mention the specific line number where the problem likely occurs
+4. When absolutely certain, mention the specific line number where the problem occurs
 5. When mentioning programming keywords, use the isiXhosa equivalents from the mapping above
 6. Only include examples if they add significant clarity
 7. IMPORTANT: If you use technical programming terms, explain them in simple isiXhosa
@@ -276,7 +274,7 @@ For slow code:
 "Ikhowudi yakho iyacotha kakhulu xa ifika kumgca [X]. Zama [specific improvement]."
 
 For missing increments:
-"Ulibale ukwandisa i-[variable] kumgca [X]. Yongeza '[variable] = [variable] + 1' ngaphakathi komjikelo."
+"Ulibale ukwandisa [variable] kumgca [X]. Yongeza '[variable] = [variable] + 1' ngaphakathi komjikelo."
 
 EXAMPLE RESPONSES:
 
@@ -284,7 +282,7 @@ Example 1 - While True without break:
 "Umjikelo wakho kumgca 3 ongu *ngexesha Inyaniso* awunasiphelo. Yongeza igama elithi *yekisa* xa ufuna ukumisa umjikelo."
 
 Example 2 - Missing counter increment:
-"Ulibale ukwandisa i-counter kumgca 5. Yongeza 'i = i + 1' ngaphakathi komjikelo ukuze i-counter inyuke."
+"Ulibale ukwandisa i kumgca 5. Yongeza 'i = i + 1' ngaphakathi komjikelo ukuze i-counter inyuke."
 
 Example 3 - Wrong condition:
 "Umjikelo wakho kumgca 2 ongu *ngexesha x > 0* awuyi kuphela kuba u-x uyanda. Tshintsha ibengu 'x = x - 1' ukuze u-x ahlе."
@@ -304,7 +302,6 @@ Respond with only the isiXhosa explanation, ensuring you use isiXhosa keywords w
 STUDENT CODE:
 {original_code}
 """
-        print(analysis_context)
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
             max_tokens=1024,
@@ -317,7 +314,6 @@ STUDENT CODE:
                         }
                     ]}]
         )
-        
         return response.content[0].text.strip()
         
     except Exception as e:

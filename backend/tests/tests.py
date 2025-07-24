@@ -263,7 +263,7 @@ print(i+1)
 29: {
     "name": "While True without break",
     "category": "Infinite Loop",
-    "code": """# While True infinite loop
+    "code": """
 ngexesha Inyaniso:
     print("This")
 """
@@ -271,7 +271,7 @@ ngexesha Inyaniso:
 30: {
     "name": "Counter never increments",
     "category": "Infinite Loop", 
-    "code": """# Counter that never changes
+    "code": """
 i = 0
 ngexesha i < 10:
     print("Count is:", i)
@@ -280,7 +280,7 @@ ngexesha i < 10:
 31: {
     "name": "Wrong increment direction",
     "category": "Infinite Loop",
-    "code": """# Counter going wrong direction
+    "code": """
 x = 10
 ngexesha x > 0:
     print("Counting down:", x)
@@ -289,7 +289,7 @@ ngexesha x > 0:
 32: {
     "name": "Nested infinite loops",
     "category": "Infinite Loop",
-    "code": """# Nested loops that never end
+    "code": """
 i = 0
 ngexesha i < 5:
     j = 0
@@ -300,7 +300,7 @@ ngexesha i < 5:
 33: {
     "name": "Condition never changes",
     "category": "Infinite Loop",
-    "code": """# Variable in condition never modified
+    "code": """
 ready = Ubuxoki
 ngexesha hayi ready:
     print("Waiting...")
@@ -309,7 +309,7 @@ ngexesha hayi ready:
 34: {
     "name": "Infinite recursion",
     "category": "Infinite Loop", 
-    "code": """# Recursive function without base case
+    "code": """
 chaza countdown(n):
     print(n)
     countdown(n - 1)
@@ -320,7 +320,7 @@ countdown(5)"""
 35: {
     "name": "For loop with crazy range",
     "category": "Infinite Loop",
-    "code": """# For loop that creates infinite iteration
+    "code": """
 ngokulandelelana i ku range(1, 100000000):
     print("Processing:", i)
 """
@@ -328,7 +328,7 @@ ngokulandelelana i ku range(1, 100000000):
 36: {
     "name": "Infinite loop with break in wrong place",
     "category": "Infinite Loop",
-    "code": """# Break statement that never executes
+    "code": """
 count = 0
 ngexesha Inyaniso:
     print("Running...")
@@ -339,7 +339,7 @@ ngexesha Inyaniso:
 37: {
     "name": "String processing infinite loop",
     "category": "Infinite Loop", 
-    "code": """# String that never gets shorter
+    "code": """
 text = "hello world"
 ngexesha len(text) > 0:
     print("Processing:", text)
@@ -349,7 +349,7 @@ ngexesha len(text) > 0:
 38: {
     "name": "Mathematical infinite loop",
     "category": "Infinite Loop",
-    "code": """# Mathematical condition that never changes
+    "code": """
 num = 4
 ngexesha num % 2 == 0:  # num is even
     print("Number is even:", num)
@@ -359,7 +359,7 @@ ngexesha num % 2 == 0:  # num is even
 39: {
     "name": "Infinite loop with multiple conditions",
     "category": "Infinite Loop",
-    "code": """# Multiple conditions, one never changes
+    "code": """
 a = 5
 b = 3
 ngexesha a > 0 okanye b > 0:
@@ -370,7 +370,7 @@ ngexesha a > 0 okanye b > 0:
 40: {
     "name": "Complex slow computation",
     "category": "Slow Code",
-    "code": """# Computationally expensive operation
+    "code": """
 total = 0
 ngokulandelelana i ku range(1000000):
     ngokulandelelana j ku range(1000):
@@ -380,7 +380,7 @@ print("Total:", total)"""
 41: {
     "name": "Slow algorithm - bubble sort",
     "category": "Slow Code",
-    "code": """# Inefficient bubble sort on large list
+    "code": """
 numbers = list(range(10000, 0, -1))  # Large reverse list
 ngokulandelelana i ku range(len(numbers)):
     ngokulandelelana j ku range(len(numbers) - 1):
