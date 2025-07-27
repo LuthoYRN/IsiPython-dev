@@ -3,8 +3,114 @@ from flask import Blueprint, request, jsonify
 from app.services.transpiler import transpile_code
 from app.services.executor import execute_python
 from app.services.errors import translate_error,translate_timeout_error
+from app.models.saved_code import saved_code_model
 
 main = Blueprint('main', __name__)
+
+@main.route('/api/save', methods=['POST'])
+def save_code():
+    """Save new code snippet"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        
+        title = data.get('title')
+        code = data.get('code')
+        user_id = data.get('user_id')
+        
+        # Basic validation
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+        
+        result = saved_code_model.create(title, code, user_id)
+        
+        if result["success"]:
+            return jsonify({
+                "message": "Code saved successfully",
+                "data": result["data"]
+            }), 201
+        elif "errors" in result:
+            return jsonify({"error": result["errors"]}), 400
+        else:
+            return jsonify({"error": result["error"]}), 400
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@main.route('/api/saved/<user_id>', methods=['GET'])
+def get_user_saved_code(user_id):
+    """Get all saved code for a specific user"""
+    try:
+        result = saved_code_model.find_by_user(user_id)
+        
+        if result["success"]:
+            return jsonify({
+                "message": "Saved code retrieved successfully",
+                "data": result["data"]
+            }), 200
+        else:
+            return jsonify({"error": result["error"]}), 500
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@main.route('/api/saved/update/<code_id>', methods=['PUT'])
+def update_saved_code(code_id):
+    """Update an existing saved code snippet"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        
+        user_id = data.get('user_id')
+        
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+        
+        # Remove user_id from data before passing to update
+        update_data = {k: v for k, v in data.items() if k != 'user_id'}
+        
+        result = saved_code_model.update(code_id, user_id, **update_data)
+        
+        if result["success"]:
+            return jsonify({
+                "message": "Code updated successfully",
+                "data": result["data"]
+            }), 200
+        elif "errors" in result:
+            return jsonify({"errors": result["errors"]}), 400
+        else:
+            return jsonify({"error": result["error"]}), 400
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@main.route('/api/saved/delete/<code_id>', methods=['DELETE'])
+def delete_saved_code(code_id):
+    """Delete a saved code snippet"""
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id') if data else None
+        
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+        
+        result = saved_code_model.delete(code_id, user_id)
+        
+        if result["success"]:
+            return jsonify({
+                "message": result["message"]
+            }), 200
+        else:
+            return jsonify({"error": result["error"]}), 400
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @main.route('/api/code', methods=['POST'])
 def run_code():
