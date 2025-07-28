@@ -28,9 +28,11 @@ class SavedCode:
             if validation_errors:
                 return {"success": False, "errors": validation_errors}
             
+            #check if filename already exists
+            unique_title = self._get_unique_title(title.strip(), user_id)
             # Insert into database
             result = self.supabase.table('saved_code').insert({
-                'title': title.strip(),
+                'title': unique_title.strip(),
                 'code': code,
                 'user_id': user_id
             }).execute()
@@ -42,6 +44,34 @@ class SavedCode:
                 
         except Exception as e:
             return {"success": False, "error": str(e)}
+
+    def _get_unique_title(self, title: str, user_id: str) -> str:
+        """Generate a unique title by appending numbers if needed"""
+        original_title = title
+        counter = 1
+        current_title = original_title
+        
+        while True:
+            # Check if current title exists
+            existing = self.supabase.table('saved_code')\
+                .select('id')\
+                .eq('user_id', user_id)\
+                .eq('title', current_title)\
+                .execute()
+            
+            if not existing.data:
+                return current_title
+            
+            # Title exists, try with number
+            current_title = f"{original_title}({counter})"
+            counter += 1
+            
+            # Safety check 
+            if counter > 100:
+                # Fallback with timestamp
+                import time
+                timestamp = int(time.time())
+                return f"{original_title}({timestamp})"
     
     def find_by_user(self, user_id: str) -> Dict[str, Any]:
         """Get all saved code for a specific user"""
