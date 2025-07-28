@@ -12,9 +12,17 @@ class SavedCode:
         
         if not title or not title.strip():
             errors['title'] = "Title is required"
-        elif len(title.strip()) > 255:
-            errors['title'] = "Title must be 255 characters or less"
-        
+        else:
+            title_clean = title.strip()
+            
+            # Check if title ends with .isi
+            if not title_clean.lower().endswith('.isi'):
+                errors['title'] = "Title must end with .isi extension"
+            elif len(title_clean) > 255:
+                errors['title'] = "Title must be 255 characters or less"
+            elif len(title_clean) <= 4:  # Just ".isi" or shorter
+                errors['title'] = "Title must have a name before .isi extension"
+            
         if not code or not code.strip():
             errors['code'] = "Code is required"
         
@@ -28,9 +36,11 @@ class SavedCode:
             if validation_errors:
                 return {"success": False, "errors": validation_errors}
             
+            #check if filename already exists
+            unique_title = self._get_unique_title(title.strip(), user_id)
             # Insert into database
             result = self.supabase.table('saved_code').insert({
-                'title': title.strip(),
+                'title': unique_title.strip(),
                 'code': code,
                 'user_id': user_id
             }).execute()
@@ -42,7 +52,58 @@ class SavedCode:
                 
         except Exception as e:
             return {"success": False, "error": str(e)}
-    
+
+    def _get_unique_title(self, title: str, user_id: str) -> str:
+        import re
+        
+        original_title = title
+        base_name = original_title[:-4]  # Remove '.isi'
+        
+        # Remove existing number pattern
+        number_pattern = r'^(.+?)\((\d+)\)$'
+        match = re.match(number_pattern, base_name)
+        
+        if match:
+            base_name = match.group(1) #remove (1) in filename(1)
+        
+        # Get all existing titles for this user
+        result = self.supabase.table('saved_code')\
+            .select('title')\
+            .eq('user_id', user_id)\
+            .execute()
+        
+        if not result.data:
+            # No existing files, return clean title
+            return f"{base_name}.isi"
+        
+        existing_titles = {row['title'] for row in result.data}
+        
+        # Check if clean base name is available
+        clean_title = f"{base_name}.isi"
+        if clean_title not in existing_titles:
+            return clean_title
+        
+        # Find the highest existing number for this base name
+        max_number = 0
+        
+        for existing_title in existing_titles:
+                
+            existing_base = existing_title[:-4]  # Remove .isi
+            
+            if existing_base == base_name:
+                # Base name without number exists
+                max_number = max(max_number, 1)
+            else:
+                # Check if it matches pattern: basename(number)
+                pattern = re.escape(base_name) + r'\((\d+)\)$'
+                match = re.match(pattern, existing_base)
+                if match:
+                    number = int(match.group(1))
+                    max_number = max(max_number, number)
+        
+        # Return next available number
+        return f"{base_name}({max_number + 1}).isi"
+
     def find_by_user(self, user_id: str) -> Dict[str, Any]:
         """Get all saved code for a specific user"""
         try:
@@ -96,7 +157,21 @@ class SavedCode:
             # Clean title if provided
             if 'title' in updates:
                 updates['title'] = updates['title'].strip()
+
+            current_file = self.supabase.table('saved_code')\
+                .select('title')\
+                .eq('id', code_id)\
+                .eq('user_id', user_id)\
+                .execute()
             
+            if not current_file.data:
+                return {"success": False, "error": "File not found or access denied"}
+            
+            current_title = current_file.data[0]['title']            
+            new_title = updates['title']
+            if current_title != new_title:
+                updates['title'] = self._get_unique_title(new_title, user_id)
+                    
             result = self.supabase.table('saved_code')\
                 .update(updates)\
                 .eq('id', code_id)\
