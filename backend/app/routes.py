@@ -121,10 +121,10 @@ def run_code():
 
     try:
         if session_id:
-            result = execute_python("", session_id, user_input)
+            result = execute_python("","",session_id, user_input)
         else:
             python_code = transpile_code(isixhosa_code)
-            result = execute_python(python_code, session_id, user_input)
+            result = execute_python(isixhosa_code,python_code, session_id, user_input)
 
         if result.get("error"):
             error_message = result['error']
@@ -136,5 +136,65 @@ def run_code():
                 result['error'] = translate_error(error_message)
         return jsonify(result), 200
 
+    except Exception as e:
+        return jsonify({"output": None, "error": str(e), "completed": True}), 500
+    
+@main.route('/api/debug/start', methods=['POST'])
+def start_debug():
+    """Start a debugging session"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        
+        isixhosa_code = data.get('code')
+        
+        if not isixhosa_code:
+            return jsonify({"error": "Code is required"}), 400
+        
+        # Transpile with debug mode enabled
+        python_code = transpile_code(isixhosa_code, debug_mode=True)
+        
+        result = execute_python(isixhosa_code,python_code, session_id=None, user_input=None)
+
+        if result.get("error"):
+            error_message = result['error']
+            if error_message.startswith('[Timeout]'):
+                result['error'] = translate_timeout_error(result['code'])
+            else:
+                result['error'] = translate_error(error_message)
+        
+        return jsonify(result), 200
+        
+    except Exception as e:
+        return jsonify({"output": None, "error": str(e), "completed": True}), 500
+
+@main.route('/api/debug/step', methods=['POST'])
+def debug_step():
+    """Send step command to continue debugging"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        
+        session_id = data.get('session_id')
+        user_input = data.get('input', "")  # Default to empty string for debug steps
+        
+        if not session_id:
+            return jsonify({"error": "Session ID is required"}), 400
+        
+        result = execute_python("", "",session_id, user_input=user_input)
+        
+        if result.get("error"):
+            error_message = result['error']
+            if error_message.startswith('[Timeout]'):
+                result['error'] = translate_timeout_error(result['code'])
+            else:
+                result['error'] = translate_error(error_message)
+        
+        return jsonify(result), 200
+        
     except Exception as e:
         return jsonify({"output": None, "error": str(e), "completed": True}), 500

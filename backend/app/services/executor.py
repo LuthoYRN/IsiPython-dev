@@ -1,6 +1,7 @@
 # app/services/executor.py
 import subprocess
 import os
+import ast
 import threading
 import queue
 import time
@@ -29,7 +30,7 @@ class ExecutionSession:
 # Global dictionary to store active sessions
 active_sessions: Dict[str, ExecutionSession] = {}
 
-def execute_python(code: str, session_id: Optional[str] = None, 
+def execute_python(original_code:str="",transpiled_code: str="", session_id: Optional[str] = None, 
                              user_input: Optional[str] = None) -> Dict[str, Any]:
     """
     Executor that can handle interactive input.
@@ -42,7 +43,7 @@ def execute_python(code: str, session_id: Optional[str] = None,
         return _get_session_status(session_id)
     else:
         # Case 3: Starting a new session
-        return _start_new_execution(code)
+        return _start_new_execution(original_code,transpiled_code)
     
 def _start_output_monitoring(session: ExecutionSession):
     def monitor_stdout():
@@ -86,18 +87,18 @@ def _start_output_monitoring(session: ExecutionSession):
     session.error_thread.start()
     print("[DEBUG] Monitoring threads started")
 
-def _start_new_execution(code: str) -> Dict[str, Any]:
+def _start_new_execution(original_code:str,transpiled_code: str) -> Dict[str, Any]:
     """Start a new execution session"""
     import uuid
     
     session_id = str(uuid.uuid4())
     session = ExecutionSession(session_id)
-    session.code = code
+    session.code = original_code
     
     temp_file = f"temp_{session_id}.py"
     try:
         with open(temp_file, "w", encoding="utf-8") as f:
-            f.write(code)
+            f.write(transpiled_code)
         
         session.process = subprocess.Popen(
             ["python", temp_file],
@@ -131,6 +132,17 @@ def _check_execution_status(session: ExecutionSession) -> Dict[str, Any]:
         # Process completed - collect all remaining output
         return _finalize_session(session, return_code)
     
+    if _is_waiting_for_debug_step(session):
+        debug_info = _parse_debug_output(session.output_lines)
+        return {
+            "session_id": session.session_id,
+            "waiting_for_debug_step": True,
+            "waiting_for_input": False,
+            "current_line": debug_info.get("line"),
+            "variables": debug_info.get("variables", {}),
+            "output": _filter_program_output(session.output_lines)
+        }
+    
     # Check if we're waiting for input
     if _is_waiting_for_input(session):
         session.is_waiting_for_input = True
@@ -138,7 +150,7 @@ def _check_execution_status(session: ExecutionSession) -> Dict[str, Any]:
             "session_id": session.session_id,
             "waiting_for_input": True,
             "prompt": session.current_prompt,
-            "output": "\n".join(session.output_lines) if session.output_lines else None
+            "output": _filter_program_output(session.output_lines)
         }
     # Check for infinite loop
     if _detect_infinite_loop(session):
@@ -147,7 +159,7 @@ def _check_execution_status(session: ExecutionSession) -> Dict[str, Any]:
     # Return current output and keep session alive
     return {
         "session_id": session.session_id,
-        "output": "\n".join(session.output_lines) if session.output_lines else None,
+        "output": _filter_program_output(session.output_lines),
         "completed": False,
         "still_running": True
     }
@@ -161,6 +173,46 @@ def _is_waiting_for_input(session: ExecutionSession) -> bool:
         return True
   
     return False
+
+def _is_waiting_for_debug_step(session: ExecutionSession) -> bool:
+    """Check if we're at a debug pause (D-D-D:STEP)"""
+    if len(session.output_lines) >= 1:
+        last_line = session.output_lines[-1]
+        if last_line == "D-D-D:STEP":
+            return True
+    return False
+
+def _parse_debug_output(output_lines):
+    """Extract debug info from recent output"""
+    debug_info = {}
+    
+    # Look for debug markers in recent output, starting from most recent
+    for line in reversed(output_lines[-10:]):
+        # Get the most recent line number (first one we encounter going backwards)
+        if "line" not in debug_info and line.startswith("D-D-D:LINE:"):
+            debug_info["line"] = int(line.split(":")[2])
+        
+        # Get the most recent variables (first one we encounter going backwards)  
+        elif "variables" not in debug_info and line.startswith("D-D-D:VARS:"):
+            try:
+                var_string = line[11:]  # Remove "D-D-D:VARS:"
+                debug_info["variables"] = ast.literal_eval(var_string)
+            except:
+                debug_info["variables"] = {}
+        
+        # Stop when we have both pieces of info
+        if "line" in debug_info and "variables" in debug_info:
+            break
+                
+    return debug_info
+
+def _filter_program_output(output_lines):
+    """Filter out debug markers, return only actual program output"""
+    filtered = []
+    for line in output_lines:
+        if not line.startswith("D-D-D:"):
+            filtered.append(line)
+    return "\n".join(filtered)
 
 def _detect_infinite_loop(session: ExecutionSession) -> bool:
     """Only called when we're NOT waiting for input"""
@@ -193,7 +245,7 @@ def _handle_infinite_loop(session: ExecutionSession) -> Dict[str, Any]:
     
     return {
         "session_id": session.session_id,
-        "output": "\n".join(session.output_lines) if session.output_lines else None,
+        "output": _filter_program_output(session.output_lines),
         "error": "[Timeout]",
         "code":session.code,
         "completed": True
@@ -263,7 +315,7 @@ def _finalize_session(session: ExecutionSession, return_code: int) -> Dict[str, 
         del active_sessions[session.session_id]
     return {
         "session_id": session.session_id,
-        "output": "\n".join(session.output_lines) if session.output_lines else None,
+        "output": _filter_program_output(session.output_lines),
         "error": "\n".join(session.error_lines) if session.error_lines else None,
         "completed": True,
     }
