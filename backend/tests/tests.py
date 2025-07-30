@@ -154,13 +154,13 @@ print(result)"""
     20: {
         "name": "Invalid For Loop Syntax",
         "category": "Loop Errors",
-        "code": """ngokulandelelana i ku range(5)
+        "code": """ngokulandelelana i ngaphakathi range(5)
     print(i)"""
     },
     21: {
         "name": "Valid For Loop",
         "category": "Loop Errors",
-        "code": """ngokulandelelana i ku range(5):
+        "code": """ngokulandelelana i ngaphakathi range(5):
     print(i)"""
     },
     22: {
@@ -255,7 +255,7 @@ enye:
         "name": "Partial working code",
         "category": "Partial Working Code",
         "code": """
-ngokulandelelana i ku range(5):
+ngokulandelelana i ngaphakathi range(5):
     print(i)
 i = None
 print(i+1)
@@ -321,7 +321,7 @@ countdown(5)"""
     "name": "For loop with crazy range",
     "category": "Infinite Loop",
     "code": """
-ngokulandelelana i ku range(1, 100000000):
+ngokulandelelana i ngaphakathi range(1, 100000000):
     print("Processing:", i)
 """
 },
@@ -372,8 +372,8 @@ ngexesha a > 0 okanye b > 0:
     "category": "Slow Code",
     "code": """
 total = 0
-ngokulandelelana i ku range(1000000):
-    ngokulandelelana j ku range(1000):
+ngokulandelelana i ngaphakathi range(1000000):
+    ngokulandelelana j ngaphakathi range(1000):
         total = total + (i * j)
 print("Total:", total)"""
 },
@@ -382,8 +382,8 @@ print("Total:", total)"""
     "category": "Slow Code",
     "code": """
 numbers = list(range(10000, 0, -1))  # Large reverse list
-ngokulandelelana i ku range(len(numbers)):
-    ngokulandelelana j ku range(len(numbers) - 1):
+ngokulandelelana i ngaphakathi range(len(numbers)):
+    ngokulandelelana j ngaphakathi range(len(numbers) - 1):
         ukuba numbers[j] > numbers[j + 1]:
             temp = numbers[j]
             numbers[j] = numbers[j + 1] 
@@ -395,14 +395,14 @@ print("Sorted!")"""
         "name": "Edge case for input/infinite loop detection",
         "category": "Input/Infinite loop",
         "code": """
-ngokulandelelana i ku range(100000):
+ngokulandelelana i ngaphakathi range(100000):
     print(i) 
 """},
 43: {
         "name": "Edge case for input/infinite loop detection",
         "category": "Input/Infinite loop",
         "code": """
-ngokulandelelana i ku range(100000):
+ngokulandelelana i ngaphakathi range(100000):
     dlula 
 """},
 }

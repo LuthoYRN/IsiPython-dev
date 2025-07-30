@@ -26,12 +26,13 @@ class ExecutionSession:
         self.error_thread = None               
         self.stop_monitoring = False   
         self.code = ""        
+        self.line_mapping = {}  # Store line mapping for error translation
         
 # Global dictionary to store active sessions
 active_sessions: Dict[str, ExecutionSession] = {}
 
-def execute_python(original_code:str="",transpiled_code: str="", session_id: Optional[str] = None, 
-                             user_input: Optional[str] = None) -> Dict[str, Any]:
+def execute_python(original_code: str = "", transpiled_code: str = "", line_mapping: dict = None,
+                   session_id: Optional[str] = None, user_input: Optional[str] = None) -> Dict[str, Any]:
     """
     Executor that can handle interactive input.
     """
@@ -43,7 +44,7 @@ def execute_python(original_code:str="",transpiled_code: str="", session_id: Opt
         return _get_session_status(session_id)
     else:
         # Case 3: Starting a new session
-        return _start_new_execution(original_code,transpiled_code)
+        return _start_new_execution(original_code, transpiled_code, line_mapping or {})
     
 def _start_output_monitoring(session: ExecutionSession):
     def monitor_stdout():
@@ -87,13 +88,14 @@ def _start_output_monitoring(session: ExecutionSession):
     session.error_thread.start()
     print("[DEBUG] Monitoring threads started")
 
-def _start_new_execution(original_code:str,transpiled_code: str) -> Dict[str, Any]:
+def _start_new_execution(original_code: str, transpiled_code: str, line_mapping: dict) -> Dict[str, Any]:
     """Start a new execution session"""
     import uuid
     
     session_id = str(uuid.uuid4())
     session = ExecutionSession(session_id)
     session.code = original_code
+    session.line_mapping = line_mapping
     
     temp_file = f"temp_{session_id}.py"
     try:
@@ -247,7 +249,7 @@ def _handle_infinite_loop(session: ExecutionSession) -> Dict[str, Any]:
         "session_id": session.session_id,
         "output": _filter_program_output(session.output_lines),
         "error": "[Timeout]",
-        "code":session.code,
+        "code": session.code,
         "completed": True
     }
 
@@ -317,5 +319,6 @@ def _finalize_session(session: ExecutionSession, return_code: int) -> Dict[str, 
         "session_id": session.session_id,
         "output": _filter_program_output(session.output_lines),
         "error": "\n".join(session.error_lines) if session.error_lines else None,
+        "line_mapping": session.line_mapping,
         "completed": True,
     }

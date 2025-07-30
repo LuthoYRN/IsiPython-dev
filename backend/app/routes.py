@@ -121,19 +121,21 @@ def run_code():
 
     try:
         if session_id:
-            result = execute_python("","",session_id, user_input)
+            result = execute_python("", "", {}, session_id, user_input)
         else:
-            python_code = transpile_code(isixhosa_code)
-            result = execute_python(isixhosa_code,python_code, session_id, user_input)
+            python_code, line_mapping = transpile_code(isixhosa_code)
+            result = execute_python(isixhosa_code, python_code, line_mapping, session_id, user_input)
 
         if result.get("error"):
             error_message = result['error']
+            line_mapping = result.get('line_mapping', {})
+            
             if error_message.startswith('[Timeout]'):
                 # Use specialized timeout/loop analyzer
-                result['error'] = translate_timeout_error(result['code'])
+                result['error'] = translate_timeout_error(result.get('code', ''))
             else:
-                # Use regular error translator
-                result['error'] = translate_error(error_message)
+                # Use regular error translator with line mapping
+                result['error'] = translate_error(error_message, line_mapping)
         return jsonify(result), 200
 
     except Exception as e:
@@ -154,16 +156,18 @@ def start_debug():
             return jsonify({"error": "Code is required"}), 400
         
         # Transpile with debug mode enabled
-        python_code = transpile_code(isixhosa_code, debug_mode=True)
+        python_code, line_mapping = transpile_code(isixhosa_code, debug_mode=True)
         
-        result = execute_python(isixhosa_code,python_code, session_id=None, user_input=None)
+        result = execute_python(isixhosa_code, python_code, line_mapping, session_id=None, user_input=None)
 
         if result.get("error"):
             error_message = result['error']
+            result_line_mapping = result.get('line_mapping', line_mapping)
+            
             if error_message.startswith('[Timeout]'):
-                result['error'] = translate_timeout_error(result['code'])
+                result['error'] = translate_timeout_error(result.get('code', ''))
             else:
-                result['error'] = translate_error(error_message)
+                result['error'] = translate_error(error_message, result_line_mapping)
         
         return jsonify(result), 200
         
@@ -185,14 +189,16 @@ def debug_step():
         if not session_id:
             return jsonify({"error": "Session ID is required"}), 400
         
-        result = execute_python("", "",session_id, user_input=user_input)
+        result = execute_python("", "", {}, session_id, user_input=user_input)
         
         if result.get("error"):
             error_message = result['error']
+            line_mapping = result.get('line_mapping', {})
+            
             if error_message.startswith('[Timeout]'):
-                result['error'] = translate_timeout_error(result['code'])
+                result['error'] = translate_timeout_error(result.get('code', ''))
             else:
-                result['error'] = translate_error(error_message)
+                result['error'] = translate_error(error_message, line_mapping)
         
         return jsonify(result), 200
         

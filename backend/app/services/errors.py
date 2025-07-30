@@ -1,11 +1,19 @@
 import anthropic
 import os
+import re
 
 client = anthropic.Anthropic(
     api_key=os.getenv("ANTHROPIC_API_KEY"),
 )
 
-def translate_error(stderr_output):
+def translate_error(stderr_output, line_mapping=None):
+    """
+    Translate Python error messages to isiXhosa, converting line numbers back to original.
+    """
+    # Convert line numbers in the error message before translation
+    if line_mapping:
+        stderr_output = _convert_line_numbers(stderr_output, line_mapping)
+    
     system_prompt = """
 You are a helpful assistant that explains Python errors to students using clear, accurate, and beginner-friendly isiXhosa.
 
@@ -37,7 +45,7 @@ KEYWORD MAPPINGS (Python → isiXhosa):
 - class → iklasi
 - pass → dlula
 - raise → phakamisa
-- in → ku
+- in → ngaphakathi
 - is → ngu
 
 STRICT RULES:
@@ -213,7 +221,7 @@ KEYWORD MAPPINGS (Python → isiXhosa):
 - class → iklasi
 - pass → dlula
 - raise → phakamisa
-- in → ku
+- in → ngaphakathi
 - is → ngu
 
 STRICT RULES:
@@ -274,7 +282,7 @@ For slow code:
 "Ikhowudi yakho iyacotha kakhulu xa ifika kumgca [X]. Zama [specific improvement]."
 
 For missing increments:
-"Ulibale ukwandisa [variable] kumgca [X]. Yongeza '[variable] = [variable] + 1' ngaphakathi komjikelo."
+"Ulibele ukwandisa [variable] kumgca [X]. Yongeza '[variable] = [variable] + 1' ngaphakathi komjikelo."
 
 EXAMPLE RESPONSES:
 
@@ -282,7 +290,7 @@ Example 1 - While True without break:
 "Umjikelo wakho kumgca 3 ongu *ngexesha Inyaniso* awunasiphelo. Yongeza igama elithi *yekisa* xa ufuna ukumisa umjikelo."
 
 Example 2 - Missing counter increment:
-"Ulibale ukwandisa i kumgca 5. Yongeza 'i = i + 1' ngaphakathi komjikelo ukuze i-counter inyuke."
+"Ulibele ukwandisa i kumgca 5. Yongeza 'i = i + 1' ngaphakathi komjikelo ukuze i-counter inyuke."
 
 Example 3 - Wrong condition:
 "Umjikelo wakho kumgca 2 ongu *ngexesha x > 0* awuyi kuphela kuba u-x uyanda. Tshintsha ibengu 'x = x - 1' ukuze u-x ahlе."
@@ -319,3 +327,25 @@ STUDENT CODE:
     except Exception as e:
         # Fallback to simple timeout message
         return "Ikhowudi yakho ithathe ixesha elide kakhulu (30 imizuzwana). Khangela imijikelwana(loops) engapheli okanye iindawo kwi khowudi yakho ezitya ixesha."
+
+def _convert_line_numbers(error_message: str, line_mapping: dict) -> str:
+    """
+    Convert Python line numbers in error messages back to original isiXhosa line numbers
+    """
+    if not line_mapping:
+        return error_message
+    
+    # Pattern to match line numbers in Python error messages
+    # Matches: "line 5", "line 12", etc.
+    line_pattern = r'line (\d+)'
+    
+    def replace_line_number(match):
+        python_line = int(match.group(1))
+        # Find the original line number from the mapping
+        original_line = line_mapping.get(python_line, python_line)
+        return f'line {original_line}'
+    
+    # Replace all line number references
+    converted_message = re.sub(line_pattern, replace_line_number, error_message)
+    
+    return converted_message

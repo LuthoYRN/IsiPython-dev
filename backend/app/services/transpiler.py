@@ -21,8 +21,7 @@ KEYWORD_MAP = {
     "jikelele": "global",          # Global
     "ukuba": "if",                 # If
     "ngenisa": "import",          # Import
-    "ku": "in",                    # In / of
-    "phakathi": "in",             # Alternate for “inside”
+    "ngaphakathi": "in",             # In
     "umsebenzi": "lambda",         # Anonymous function
     "ingaphandle": "nonlocal",     # Opposite of local
     "hayi": "not",                 # Logical NOT
@@ -39,27 +38,39 @@ KEYWORD_MAP = {
     "okanye_ukuba": "elif"               # If using "okanye" for both `or` and `elif`, disambiguate during parsing
 }
 
-def transpile_code(source_code: str, debug_mode: bool = False) -> str:
-    """Transpile IsiPython code into valid Python code, ignoring comments."""
+def transpile_code(source_code: str, debug_mode: bool = False) -> tuple[str, dict]:
+    """
+    Transpile IsiPython code into valid Python code, ignoring comments.
+    Returns tuple of (transpiled_code, line_mapping)
+    """
     lines = source_code.splitlines()
     result = []
+    line_mapping = {}  # Maps transpiled_line_num -> original_line_num
 
-    for line in lines:
+    current_output_line = 1
+    
+    for original_line_num, line in enumerate(lines, 1):
         # Separate code from comment
         if "#" in line:
             code_part, comment_part = line.split("#", 1)
             code_transpiled = _substitute_keywords(code_part)
-            result.append(f"{code_transpiled}#{comment_part}")
+            transpiled_line = f"{code_transpiled}#{comment_part}"
         else:
-            result.append(_substitute_keywords(line))
+            transpiled_line = _substitute_keywords(line)
+        
+        result.append(transpiled_line)
+        line_mapping[current_output_line] = original_line_num
+        current_output_line += 1
 
     transpiled_code = "\n".join(result)
     
     if debug_mode:
-        transpiled_code = _add_debug_instrumentation(transpiled_code)
+        transpiled_code, debug_mapping = _add_debug_instrumentation(transpiled_code, line_mapping)
+        line_mapping = debug_mapping
 
-    final_code = _convert_input_calls(transpiled_code,debug_mode=debug_mode)
-    return final_code
+    final_code, input_mapping = _convert_input_calls(transpiled_code, line_mapping, debug_mode=debug_mode)
+    
+    return final_code, input_mapping
 
 def _substitute_keywords(line: str) -> str:
     """Helper: substitute keywords only in code, not comments."""
@@ -68,17 +79,20 @@ def _substitute_keywords(line: str) -> str:
             line = re.sub(rf'\b{xhosa_kw}\b', py_kw, line)
     return line
 
-def _convert_input_calls(code: str,debug_mode:bool =False) -> str:
+def _convert_input_calls(code: str, existing_mapping: dict, debug_mode: bool = False) -> tuple[str, dict]:
     """
     Convert input("prompt") calls to print("prompt") + input("")
     Preserves indentation and handles complex cases
+    Returns updated code and line mapping
     """
     import re
     
     lines = code.split('\n')
     result_lines = []
+    new_mapping = {}
+    current_output_line = 1
     
-    for line in lines:
+    for line_num, line in enumerate(lines, 1):
         # Check if this line contains input() with a prompt
         input_match = re.search(r'input\s*\(\s*(["\'])(.*?)\1\s*\)', line)
         
@@ -95,31 +109,49 @@ def _convert_input_calls(code: str,debug_mode:bool =False) -> str:
             # Replace input("prompt") with input("") in the original line
             new_line = line.replace(f'input({quote_char}{prompt_text}{quote_char})', 'input("")')
             
-            # Add both lines
+            # Add print line (maps to same original line as the input line)
             result_lines.append(print_line)
+            original_line = existing_mapping.get(line_num, line_num)
+            new_mapping[current_output_line] = original_line
+            current_output_line += 1
+            
+            # Add modified input line
             result_lines.append(new_line)
+            new_mapping[current_output_line] = original_line
+            current_output_line += 1
         else:
             result_lines.append(line)
+            # Preserve existing mapping
+            original_line = existing_mapping.get(line_num, line_num)
+            new_mapping[current_output_line] = original_line
+            current_output_line += 1
 
     if debug_mode:
         result_lines = [line.replace('debug_pause()', 'input("")') for line in result_lines]
     
-    return '\n'.join(result_lines)
+    return '\n'.join(result_lines), new_mapping
 
-def _add_debug_instrumentation(code: str) -> str:
-    """Add debug instrumentation to code for step-by-step execution"""
+def _add_debug_instrumentation(code: str, existing_mapping: dict) -> tuple[str, dict]:
+    """
+    Add debug instrumentation to code for step-by-step execution
+    Returns updated code and line mapping
+    """
     lines = code.split('\n')
     instrumented = []
-    line_number = 1
+    new_mapping = {}
+    current_output_line = 1
     
-    for line in lines:
+    for line_num, line in enumerate(lines, 1):
         original_line = line
         stripped_line = line.strip()
         
         # Skip empty lines and comments
         if not stripped_line or stripped_line.startswith('#'):
             instrumented.append(original_line)
-            line_number+=1
+            # Preserve mapping for empty/comment lines
+            original_source_line = existing_mapping.get(line_num, line_num)
+            new_mapping[current_output_line] = original_source_line
+            current_output_line += 1
             continue
         
         # Skip control structure keywords entirely - don't debug them
@@ -133,7 +165,9 @@ def _add_debug_instrumentation(code: str) -> str:
         
         if is_control_structure:
             instrumented.append(original_line)
-            line_number+=1
+            original_source_line = existing_mapping.get(line_num, line_num)
+            new_mapping[current_output_line] = original_source_line
+            current_output_line += 1
             continue
         else:
             # Check if this line exits the current scope
@@ -144,15 +178,31 @@ def _add_debug_instrumentation(code: str) -> str:
             indentation = len(line) - len(line.lstrip())
             indent_str = ' ' * indentation
             
-            instrumented.append(f'{indent_str}print("D-D-D:LINE:{line_number}")')
+            # Get original source line number
+            original_source_line = existing_mapping.get(line_num, line_num)
+            
+            # Add debug line info
+            instrumented.append(f'{indent_str}print("D-D-D:LINE:{original_source_line}")')
+            new_mapping[current_output_line] = original_source_line
+            current_output_line += 1
+            
+            # Add original line
             instrumented.append(original_line)
+            new_mapping[current_output_line] = original_source_line
+            current_output_line += 1
             
             # Only add debug pause if this line doesn't exit the scope
             if not is_exit_statement:
                 instrumented.append(f'{indent_str}print("D-D-D:VARS:" + str({{k: v for k, v in locals().items() if not k.startswith("__") and type(v) in [int, float, str, bool, list, dict, type(None)]}}))')
+                new_mapping[current_output_line] = original_source_line
+                current_output_line += 1
+                
                 instrumented.append(f'{indent_str}print("D-D-D:STEP")')
+                new_mapping[current_output_line] = original_source_line
+                current_output_line += 1
+                
                 instrumented.append(f'{indent_str}debug_pause()')
-        
-        line_number += 1
+                new_mapping[current_output_line] = original_source_line
+                current_output_line += 1
     
-    return '\n'.join(instrumented)
+    return '\n'.join(instrumented), new_mapping
