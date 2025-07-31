@@ -148,12 +148,18 @@ def _check_execution_status(session: ExecutionSession) -> Dict[str, Any]:
     # Check if we're waiting for input
     if _is_waiting_for_input(session):
         session.is_waiting_for_input = True
-        return {
+        result = {
             "session_id": session.session_id,
             "waiting_for_input": True,
             "prompt": session.current_prompt,
             "output": _filter_program_output(session.output_lines)
         }
+        if _is_in_debug_mode(session):
+            debug_info = _parse_debug_output(session.output_lines)
+            current_line = debug_info.get("line")
+            if current_line:
+                result["current_line"] = current_line
+        return result
     # Check for infinite loop
     if _detect_infinite_loop(session):
         return _handle_infinite_loop(session)
@@ -165,6 +171,13 @@ def _check_execution_status(session: ExecutionSession) -> Dict[str, Any]:
         "completed": False,
         "still_running": True
     }
+
+def _is_in_debug_mode(session: ExecutionSession) -> bool:
+    """Check if the session is running in debug mode by looking for debug markers in output"""
+    for line in session.output_lines:
+        if line.startswith("D-D-D:"):
+            return True
+    return False
 
 def _is_waiting_for_input(session: ExecutionSession) -> bool:
     if not session.process or session.process.poll() is not None:
