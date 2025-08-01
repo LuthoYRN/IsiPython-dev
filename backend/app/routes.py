@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 #from . import db
 from app.services.transpiler import transpile_code
-from app.services.executor import execute_python
+from app.services.executor import execute_python,kill_session
 from app.services.errors import translate_error,translate_timeout_error
 from app.models.saved_code import saved_code_model
 
@@ -173,6 +173,16 @@ def start_debug():
         
     except Exception as e:
         return jsonify({"output": None, "error": str(e), "completed": True}), 500
+
+@main.route('/api/session/kill/<session_id>', methods=['DELETE'])
+def terminate_session(session_id):
+    """Kill a running execution session"""
+    try:
+        result = kill_session(session_id)
+        return jsonify(result), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @main.route('/api/debug/step', methods=['POST'])
 def debug_step():

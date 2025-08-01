@@ -335,3 +335,26 @@ def _finalize_session(session: ExecutionSession, return_code: int) -> Dict[str, 
         "line_mapping": session.line_mapping,
         "completed": True,
     }
+
+def kill_session(session_id) ->Dict[str, Any]:
+    """Kill a running execution session"""
+    if session_id not in active_sessions:
+        return ({"error": "Session not found"}), 404
+        
+    session = active_sessions[session_id]
+        
+    # Kill the process if it's running
+    if session.process and session.process.poll() is None:
+        session.process.kill()
+            
+    # Clean up temp file
+    temp_file = f"temp_{session_id}.py"
+    if os.path.exists(temp_file):
+        os.remove(temp_file)
+            
+    # Remove from active sessions
+    del active_sessions[session_id]
+    return ({
+            "message": "Session killed successfully",
+            "session_id": session_id
+        })
