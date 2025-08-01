@@ -97,7 +97,7 @@ enye:
     13: {
         "name": "Missing Condition in While",
         "category": "Control Structure Errors",
-        "code": """ngexesha:
+        "code": """ngelixa:
     print("Infinite?")"""
     },
     14: {
@@ -167,7 +167,7 @@ print(result)"""
         "name": "Valid While Loop",
         "category": "Loop Errors",
         "code": """count = 0
-ngexesha count < 3:
+ngelixa count < 3:
     print(count)
     count = count + 1"""
     },
@@ -264,7 +264,7 @@ print(i+1)
     "name": "While True without break",
     "category": "Infinite Loop",
     "code": """
-ngexesha Inyaniso:
+ngelixa Inyaniso:
     print("This")
 """
 },
@@ -273,7 +273,7 @@ ngexesha Inyaniso:
     "category": "Infinite Loop", 
     "code": """
 i = 0
-ngexesha i < 10:
+ngelixa i < 10:
     print("Count is:", i)
 """
 },
@@ -282,7 +282,7 @@ ngexesha i < 10:
     "category": "Infinite Loop",
     "code": """
 x = 10
-ngexesha x > 0:
+ngelixa x > 0:
     print("Counting down:", x)
     x = x + 1"""
 },
@@ -291,9 +291,9 @@ ngexesha x > 0:
     "category": "Infinite Loop",
     "code": """
 i = 0
-ngexesha i < 5:
+ngelixa i < 5:
     j = 0
-    ngexesha j < 3:
+    ngelixa j < 3:
         print(i, j)
     i = i + 1"""
 },
@@ -302,7 +302,7 @@ ngexesha i < 5:
     "category": "Infinite Loop",
     "code": """
 ready = Ubuxoki
-ngexesha hayi ready:
+ngelixa hayi ready:
     print("Waiting...")
 """
 },
@@ -330,7 +330,7 @@ ngokulandelelana i ngaphakathi range(1, 100000000):
     "category": "Infinite Loop",
     "code": """
 count = 0
-ngexesha Inyaniso:
+ngelixa Inyaniso:
     print("Running...")
     ukuba count == 10:
         yekisa
@@ -341,7 +341,7 @@ ngexesha Inyaniso:
     "category": "Infinite Loop", 
     "code": """
 text = "hello world"
-ngexesha len(text) > 0:
+ngelixa len(text) > 0:
     print("Processing:", text)
     text = text + "!"
 """
@@ -351,7 +351,7 @@ ngexesha len(text) > 0:
     "category": "Infinite Loop",
     "code": """
 num = 4
-ngexesha num % 2 == 0:  # num is even
+ngelixa num % 2 == 0:  # num is even
     print("Number is even:", num)
     num = num * 2
 """
@@ -362,7 +362,7 @@ ngexesha num % 2 == 0:  # num is even
     "code": """
 a = 5
 b = 3
-ngexesha a > 0 okanye b > 0:
+ngelixa a > 0 okanye b > 0:
     print("Both positive")
     a = a - 1
 """

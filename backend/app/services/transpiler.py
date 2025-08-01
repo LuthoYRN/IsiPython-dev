@@ -5,7 +5,7 @@ KEYWORD_MAP = {
     "Inyaniso": "True",            # Means "truth"
     "Akukho": "None",              # Means "nothing"
     "kwaye": "and",                # Logical AND
-    "njenga": "as",                # Used in aliasing
+    "njenge": "as",                # Used in aliasing
     "qinisekisa": "assert",        # Ensure/verify
     "ngemva": "async", #??  
     "linda": "await",              # Wait
@@ -29,7 +29,7 @@ KEYWORD_MAP = {
     "phakamisa": "raise",          # Raise an error
     "buyisela": "return",          # Return / give back
     "zama": "try",                 # Attempt
-    "ngexesha": "while",           # While
+    "ngelixa": "while",           # While
     "nge": "with",                 # With (context manager)
     "velisa": "yield",             # Produce/generate
     "ngokulandelelana": "for",     #for i in range()
