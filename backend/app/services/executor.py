@@ -21,12 +21,24 @@ class ExecutionSession:
         self.is_complete = False
         self.start_time = time.time()
         self.last_output_time = time.time()
-        self.last_resume = time.time()  
+        self.last_activity = time.time()  # Track last user interaction
+        self.max_output_lines = 100  # Limit output buffer
         self.output_thread = None              
         self.error_thread = None               
         self.stop_monitoring = False   
         self.code = ""        
         self.line_mapping = {}  # Store line mapping for error translation
+    
+    def update_activity(self):
+        """Update the last activity timestamp"""
+        self.last_activity = time.time()
+    
+    def add_output_line(self, line: str):
+        """Add output line with limit enforcement"""
+        self.output_lines.append(line)
+        if len(self.output_lines) > self.max_output_lines:
+            # Keep only the last N lines
+            self.output_lines = self.output_lines[-self.max_output_lines:]
         
 # Global dictionary to store active sessions
 active_sessions: Dict[str, ExecutionSession] = {}
@@ -58,7 +70,7 @@ def _start_output_monitoring(session: ExecutionSession):
                     if line.startswith(">>>"): #for input prompts
                         clean_line = clean_line[3:]
                         session.current_prompt = clean_line
-                    session.output_lines.append(clean_line)
+                    session.add_output_line(clean_line)
                     session.last_output_time = time.time()
                     print(f"[DEBUG] Captured stdout: '{clean_line}'")
                 else:
@@ -231,9 +243,9 @@ def _filter_program_output(output_lines):
 
 def _detect_infinite_loop(session: ExecutionSession) -> bool:
     """Only called when we're NOT waiting for input"""
-    time_running = time.time() - session.last_resume
+    time_running = time.time() - session.last_activity
     
-    if time_running > 30:  # 30 seconds without input prompt
+    if time_running > 10:  # 10 seconds without activity
         print(f"[DEBUG] Long running/slow/possible infinite loop detected: {time_running:.1f}s")
         return True
     
@@ -241,23 +253,10 @@ def _detect_infinite_loop(session: ExecutionSession) -> bool:
 
 def _handle_infinite_loop(session: ExecutionSession) -> Dict[str, Any]:
     """Handle long running code/ possible infinite loop by killing process and cleaning up"""
-    print(f"[DEBUG] Killing long running process PID: {session.process.pid}")
+    print(f"[DEBUG] Killing potential infinite loop/long running process PID: {session.process.pid}")
     
     # Kill the process
-    session.process.kill()
-    
-    # Clean up
-    temp_file = f"temp_{session.session_id}.py"
-    if os.path.exists(temp_file):
-        try:
-            os.remove(temp_file)
-        except Exception:
-            pass
-    
-    # Remove from active sessions
-    if session.session_id in active_sessions:
-        del active_sessions[session.session_id]
-    
+    kill_session(session.session_id)
     return {
         "session_id": session.session_id,
         "output": _filter_program_output(session.output_lines),
@@ -280,7 +279,7 @@ def _continue_session_with_input(session_id: str, user_input: str) -> Dict[str, 
         # Write the input to the process
         session.process.stdin.write(user_input + '\n')
         session.process.stdin.flush()
-        session.last_resume = time.time()
+        session.update_activity()
         session.current_prompt = ""
         print(f"[DEBUG] Sent input to process: '{user_input}'")
         
@@ -308,7 +307,7 @@ def _finalize_session(session: ExecutionSession, return_code: int) -> Dict[str, 
         try:
             # Read remaining stdout
             for line in session.process.stdout:
-                session.output_lines.append(line.rstrip('\n'))
+                session.add_output_line(line.rstrip('\n'))
             # Read remaining stderr
             for line in session.process.stderr:
                 session.error_lines.append(line.rstrip('\n'))
