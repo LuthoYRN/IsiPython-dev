@@ -135,6 +135,7 @@ def run_code():
                 result['error'] = translate_timeout_error(result.get('code', ''))
             else:
                 # Use regular error translator with line mapping
+                result['english_error'] = error_message
                 result['error'] = translate_error(error_message, line_mapping)
         return jsonify(result), 200
 
@@ -167,6 +168,7 @@ def start_debug():
             if error_message.startswith('[Timeout]'):
                 result['error'] = translate_timeout_error(result.get('code', ''))
             else:
+                result['english_error'] = error_message
                 result['error'] = translate_error(error_message, result_line_mapping)
         
         return jsonify(result), 200
@@ -208,6 +210,7 @@ def debug_step():
             if error_message.startswith('[Timeout]'):
                 result['error'] = translate_timeout_error(result.get('code', ''))
             else:
+                result['english_error'] = error_message
                 result['error'] = translate_error(error_message, line_mapping)
         
         return jsonify(result), 200
