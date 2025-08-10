@@ -13,11 +13,13 @@ class Challenge:
         errors = {}
         
         # Title validation
-        if not data.get('title') or not data['title'].strip():
-            errors['title'] = "Title is required"
-        elif len(data['title'].strip()) > 255:
-            errors['title'] = "Title must be 255 characters or less"
+        title = data.get('title', '').strip()
         
+        if not title:
+            errors['title'] = "Title is required"
+        elif len(title) > 255:
+            errors['title'] = "Title must be 255 characters or less"
+            
         # Problem statement validation
         if not data.get('problem_statement') or not data['problem_statement'].strip():
             errors['problem_statement'] = "Problem statement is required"
@@ -105,6 +107,19 @@ class Challenge:
             
             counter += 1
 
+    def _check_title_uniqueness(self, title: str, exclude_id: Optional[str] = None) -> bool:
+        """Check if title already exists"""
+        query = self.supabase.table('challenges')\
+            .select('id')\
+            .eq('title', title.strip())
+        
+        # Exclude current challenge when updating
+        if exclude_id:
+            query = query.neq('id', exclude_id)
+        
+        result = query.execute()
+        return len(result.data) == 0  # True if title is unique
+
     def create(self, challenge_data: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new challenge"""
         try:
@@ -113,6 +128,10 @@ class Challenge:
             if validation_errors:
                 return {"success": False, "errors": validation_errors}
             
+            title = challenge_data['title'].strip()
+            if not self._check_title_uniqueness(title):
+                return {"success": False, "errors": {"title": "A challenge with this title already exists"}}
+           
             # Generate unique slug
             title = challenge_data['title'].strip()
             slug = self._get_unique_slug(title)
@@ -225,13 +244,18 @@ class Challenge:
             if validation_errors:
                 return {"success": False, "errors": validation_errors}
             
+            if 'title' in updates:
+                title = updates['title'].strip()
+                if not self._check_title_uniqueness(title, exclude_id=challenge_id):
+                    return {"success": False, "errors": {"title": "A challenge with this title already exists"}}
+           
             # Prepare update data
             update_data = {}
             
             # Handle fields that can be updated
             updatable_fields = [
                 'title', 'short_description', 'problem_statement', 
-                'difficulty_level', 'tags', 'reward_points', 
+                'difficulty_level', 'tags', 'reward_points', 'published_at',
                 'estimated_time', 'status', 'send_notifications'
             ]
             

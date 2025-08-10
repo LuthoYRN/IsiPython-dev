@@ -14,7 +14,9 @@ def create_app():
     app = Flask(__name__, instance_relative_config=True)
     CORS(app)
 
-    from .routes import main
+    from .routes.code_execution import main
+    from .routes.admin_challenges import admin_challenges
     app.register_blueprint(main)
+    app.register_blueprint(admin_challenges)
 
     return app
