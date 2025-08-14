@@ -309,52 +309,5 @@ class Challenge:
         except Exception as e:
             return {"success": False, "error": str(e)}
         
-    def publish(self, challenge_id: str) -> Dict[str, Any]:
-        """Publish a challenge (change status to published)"""
-        try:
-            # Check if challenge has test cases before publishing
-            test_cases = self.supabase.table('challenge_test_cases')\
-                .select('id, points_weight')\
-                .eq('challenge_id', challenge_id)\
-                .execute()
-            
-            if not test_cases.data:
-                return {
-                    "success": False, 
-                    "error": "Cannot publish challenge without test cases"
-                }
-            
-            # Check if test case weights sum to reward points
-            challenge_result = self.find_by_id(challenge_id)
-            if not challenge_result["success"]:
-                return challenge_result
-            
-            challenge = challenge_result["data"]
-            total_weight = sum(float(tc.get('points_weight', 0)) for tc in test_cases.data)
-            
-            if total_weight != challenge['reward_points']:
-                return {
-                    "success": False, 
-                    "error": f"Test case weights ({total_weight}) must equal reward points ({challenge['reward_points']})"
-                }
-            
-            # Update status to published
-            result = self.supabase.table('challenges')\
-                .update({
-                    'status': 'published',
-                    'published_at': 'now()',
-                    'updated_at': 'now()'
-                })\
-                .eq('id', challenge_id)\
-                .execute()
-            
-            if result.data:
-                return {"success": True, "data": result.data[0]}
-            else:
-                return {"success": False, "error": "Failed to publish challenge"}
-                
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-
 # Create instance for use in routes
 challenge_model = Challenge()

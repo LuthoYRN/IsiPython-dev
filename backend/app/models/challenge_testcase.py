@@ -73,53 +73,6 @@ class ChallengeTestCase:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def create_bulk(self, challenge_id: str, test_cases: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Create multiple test cases for a challenge"""
-        try:
-            # Validate all test cases first
-            all_errors = {}
-            for i, test_case in enumerate(test_cases):
-                validation_errors = self.validate_data(test_case)
-                if validation_errors:
-                    for field, error in validation_errors.items():
-                        all_errors[f'test_cases.{i}.{field}'] = error
-            
-            if all_errors:
-                return {"success": False, "errors": all_errors}
-            
-            # Check if challenge exists
-            challenge_check = self.supabase.table('challenges')\
-                .select('id, reward_points')\
-                .eq('id', challenge_id)\
-                .execute()
-            
-            if not challenge_check.data:
-                return {"success": False, "error": "Challenge not found"}
-            
-            # Prepare bulk insert data
-            insert_data = []
-            for test_case in test_cases:
-                insert_data.append({
-                    'challenge_id': challenge_id,
-                    'input_data': test_case.get('input_data', []),
-                    'expected_output': test_case['expected_output'].strip(),
-                    'explanation': test_case.get('explanation', '').strip() or None,
-                    'is_hidden': test_case.get('is_hidden', False),
-                    'is_example': test_case.get('is_example', False),
-                    'points_weight': float(test_case.get('points_weight', 0))
-                })
-            
-            # Insert all test cases
-            result = self.supabase.table('challenge_test_cases').insert(insert_data).execute()
-            
-            if result.data:
-                return {"success": True, "data": result.data}
-            else:
-                return {"success": False, "error": "Failed to create test cases"}
-                
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-
     def find_by_challenge(self, challenge_id: str) -> Dict[str, Any]:
         """Get all test cases for a challenge"""
         try:
@@ -190,18 +143,6 @@ class ChallengeTestCase:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def delete(self, test_case_id: str) -> Dict[str, Any]:
-        """Delete a test case"""
-        try:
-            result = self.supabase.table('challenge_test_cases')\
-                .delete()\
-                .eq('id', test_case_id)\
-                .execute()
-            
-            return {"success": True, "message": "Test case deleted successfully"}
-            
-        except Exception as e:
-            return {"success": False, "error": str(e)}
 
     def delete_by_challenge(self, challenge_id: str) -> Dict[str, Any]:
         """Delete all test cases for a challenge"""
