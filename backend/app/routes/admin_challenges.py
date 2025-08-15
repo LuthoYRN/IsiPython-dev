@@ -180,7 +180,7 @@ def _update_existing_challenge(challenge_id, data):
         action = data.get('action', 'save_draft')
         if action == 'publish':
             challenge_updates['status'] = 'published'
-            challenge_updates['published_at'] = 'now'
+            challenge_updates['published_at'] = 'now()'
         elif action == 'save_draft':
             challenge_updates['status'] = 'draft'
         # preview doesn't change status

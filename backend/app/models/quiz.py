@@ -240,7 +240,7 @@ class Quiz:
             
             # Handle fields that can be updated
             updatable_fields = [
-                'title', 'description', 'instructions', 'due_date',
+                'title', 'description', 'instructions', 'due_date','published_at',
                 'time_limit_minutes', 'status', 'randomize_question_order',
                 'allow_multiple_attempts', 'send_notifications', 'show_results_immediately'
             ]

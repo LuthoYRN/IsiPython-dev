@@ -16,7 +16,9 @@ def create_app():
 
     from .routes.code_execution import main
     from .routes.admin_challenges import admin_challenges
+    from .routes.admin_quizzes import admin_quizzes
     app.register_blueprint(main)
     app.register_blueprint(admin_challenges)
+    app.register_blueprint(admin_quizzes)
 
     return app
