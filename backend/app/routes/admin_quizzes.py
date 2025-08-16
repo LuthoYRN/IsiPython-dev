@@ -17,7 +17,11 @@ def create_or_update_quiz():
         quiz_id = data.get('id')  # If provided, we're updating
         questions = data.get('questions', [])
         action = data.get('action', 'save_draft')  # save_draft | publish
-             
+        valid_actions = ['save_draft', 'publish'] 
+        if action not in valid_actions:
+            return jsonify({
+                "error": f"Invalid action. Must be one of: {', '.join(valid_actions)}"
+            }), 400     
         # STEP 1: Check if we need to publish but don't have questions
         if action == 'publish' and not questions:
             return jsonify({"error": "Cannot publish quiz without questions"}), 400
@@ -71,12 +75,13 @@ def _create_new_quiz(data):
             question_result = quiz_question_model.create_bulk(quiz_id, questions)
             if question_result["success"]:
                 created_questions = question_result["data"]
+                quiz = question_result["updated_quiz"]
             else:
                 # If questions fail, clean up by deleting the quiz
                 quiz_model.delete(quiz_id)
                 return {
                     "success": False,
-                    "error": f"Failed to create questions: {question_result['error']}"
+                    "error": f"Failed to create questions: {question_result.get('error', question_result.get('errors', 'Unknown error'))}"
                 }
         
         # STEP 4: If action is publish and we have questions, update status to published
@@ -107,6 +112,7 @@ def _update_existing_quiz(quiz_id, data):
     try:
         # STEP 1: Check if quiz exists
         existing_quiz = quiz_model.find_by_id(quiz_id)
+        quiz_data = existing_quiz["data"]
         if not existing_quiz["success"]:
             return {"success": False, "error": "Quiz not found"}
         
@@ -116,7 +122,7 @@ def _update_existing_quiz(quiz_id, data):
         updated_questions = []
         
         # STEP 2: Handle questions if provided
-        if questions:
+        if questions and not quiz_data['status'] == 'published':
             # Delete existing questions first
             quiz_question_model.delete_by_quiz(quiz_id)
             
@@ -132,10 +138,12 @@ def _update_existing_quiz(quiz_id, data):
             else:
                 return {
                     "success": False,
-                    "error": f"Failed to update questions: {question_result['error']}"
+                    "error": f"Failed to update questions: {question_result.get('error', question_result.get('errors', 'Unknown error'))}"
                 }
+        elif not questions and not quiz_data['status'] == 'published':
+            quiz_question_model.delete_by_quiz(quiz_id) #empty question array and save as draft
         else:
-            # Get existing questions if none provided
+            # Get existing questions - cannot edit questions if status is published
             existing_questions = quiz_question_model.find_by_quiz(quiz_id)
             if existing_questions["success"]:
                 updated_questions = existing_questions["data"]
@@ -147,6 +155,7 @@ def _update_existing_quiz(quiz_id, data):
             quiz_updates['published_at']='now()'
         elif action == 'save_draft':
             quiz_updates['status'] = 'draft'
+            quiz_updates['published_at']=None
         
         quiz_result = quiz_model.update(quiz_id, quiz_updates)
         if not quiz_result["success"]:
@@ -235,20 +244,6 @@ def delete_quiz(quiz_id):
             
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@admin_quizzes.route('/api/admin/quizzes/<quiz_id>/questions', methods=['GET'])
-def get_quiz_questions(quiz_id):
-    """Get all questions for a specific quiz"""
-    try:
-        result = quiz_question_model.find_by_quiz(quiz_id, include_answers=True)
-        
-        if result["success"]:
-            return jsonify({
-                "message": "Quiz questions retrieved successfully",
-                "data": result["data"]
-            }), 200
-        else:
-            return jsonify({"error": result["error"]}), 500
-            
+          
     except Exception as e:
         return jsonify({"error": str(e)}), 500
