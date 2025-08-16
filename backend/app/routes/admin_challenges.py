@@ -34,7 +34,13 @@ def create_or_update_challenge():
         if action == 'publish' and not test_cases:
             return jsonify({"error": "Cannot publish challenge without test cases"}), 400
         
-        # STEP 3: Determine if we're creating or updating
+        # STEP 3: Check if we need to publish and have test cases
+        if action == 'publish' and test_cases:
+            publish_validation = _validate_challenge_for_publishing(test_cases)
+            if not publish_validation["valid"]:
+                return jsonify({"success": False, "error": publish_validation["error"]}),400
+        
+        # STEP 4: Determine if we're creating or updating
         if challenge_id:
             # UPDATE EXISTING CHALLENGE
             result = _update_existing_challenge(challenge_id, data)
@@ -209,6 +215,26 @@ def _update_existing_challenge(challenge_id, data):
         
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+def _validate_challenge_for_publishing(test_cases: list = None) -> dict:
+    """Validate that challenge has required test cases for publishing"""  
+    # Check for required test case types
+    has_example = any(tc.get('is_example', False) for tc in test_cases)
+    has_hidden = any(tc.get('is_hidden', False) for tc in test_cases)
+    
+    errors = []
+    if not has_example:
+        errors.append("At least 1 example test case is required")
+    if not has_hidden:
+        errors.append("At least 1 hidden test case is required")
+    
+    if errors:
+        return {
+            "valid": False,
+            "error": ". ".join(errors) + "."
+        }
+    
+    return {"valid": True}
 
 @admin_challenges.route('/api/admin/challenges', methods=['GET'])
 def list_challenges():
