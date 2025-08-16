@@ -18,6 +18,11 @@ def create_or_update_challenge():
         test_cases = data.get('test_cases', [])
         reward_points = data.get('reward_points', 0)
         action = data.get('action', 'save_draft')  # save_draft | publish 
+        valid_actions = ['save_draft', 'publish'] 
+        if action not in valid_actions:
+            return jsonify({
+                "error": f"Invalid action. Must be one of: {', '.join(valid_actions)}"
+            }), 400
         
         # STEP 1: Validate test case weights BEFORE any database operations
         if test_cases:
@@ -146,6 +151,7 @@ def _update_existing_challenge(challenge_id, data):
     try:
         # STEP 1: Check if challenge exists
         existing_challenge = challenge_model.find_by_id(challenge_id)
+        challenge_data = existing_challenge["data"]
         if not existing_challenge["success"]:
             return {"success": False, "error": "Challenge not found"}
         
@@ -170,6 +176,8 @@ def _update_existing_challenge(challenge_id, data):
                         "success": False,
                         "error": f"Failed to create test case: {test_case_result['error']}"
                     }
+        elif not test_cases and not challenge_data['status'] == 'published':
+            challenge_test_case_model.delete_by_challenge(challenge_id) #empty test case array and save as draft
         else:
             # Get existing test cases if none provided
             existing_test_cases = challenge_test_case_model.find_by_challenge(challenge_id)
@@ -183,6 +191,7 @@ def _update_existing_challenge(challenge_id, data):
             challenge_updates['published_at'] = 'now()'
         elif action == 'save_draft':
             challenge_updates['status'] = 'draft'
+            challenge_updates['published_at'] = None
         # preview doesn't change status
         
         challenge_result = challenge_model.update(challenge_id, challenge_updates)
