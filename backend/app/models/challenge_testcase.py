@@ -26,11 +26,19 @@ class ChallengeTestCase:
                 errors['points_weight'] = "Points weight must be 0 or greater"
         except (ValueError, TypeError):
             errors['points_weight'] = "Points weight must be a valid number"
-        
-        # Boolean field validation
-        for field in ['is_hidden', 'is_example']:
-            if field in data and not isinstance(data[field], bool):
+            
+        # Boolean field validation 
+        required_boolean_fields = ['is_hidden', 'is_example']
+        for field in required_boolean_fields:
+            if field not in data:
+                errors[field] = f"{field.replace('_', ' ').title()} is required"
+            elif not isinstance(data[field], bool):
                 errors[field] = f"{field.replace('_', ' ').title()} must be true or false"
+        
+        # Logical validation: hidden and example cannot both be true
+        if data.get('is_hidden') and data.get('is_example'):
+            errors['is_hidden'] = "Test case cannot be both hidden and an example"
+            errors['is_example'] = "Test case cannot be both hidden and an example"
         
         return errors
 
