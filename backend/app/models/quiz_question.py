@@ -15,7 +15,7 @@ class QuizQuestion:
             errors['question_text'] = "Question text is required"
         
         # Options validation
-        required_options = ['   ', 'option_b', 'option_c', 'option_d']
+        required_options = ['option_a', 'option_b', 'option_c', 'option_d']
         for option in required_options:
             if not data.get(option) or not data[option].strip():
                 errors[option] = f"{option.replace('_', ' ').title()} is required"
@@ -77,8 +77,8 @@ class QuizQuestion:
             
             if result.data:
                 # Update quiz totals
-                self._update_quiz_totals(quiz_id)
-                return {"success": True, "data": result.data[0]}
+                quiz = self._update_quiz_totals(quiz_id)
+                return {"success": True,"updated_quiz":quiz, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to create question"}
                 
@@ -102,7 +102,7 @@ class QuizQuestion:
             # Check if quiz exists
             quiz_check = self.supabase.table('quizzes')\
                 .select('id')\
-                .eq('quiz_id', quiz_id)\
+                .eq('id', quiz_id)\
                 .execute()
             
             if not quiz_check.data:
@@ -133,8 +133,8 @@ class QuizQuestion:
             
             if result.data:
                 # Update quiz totals
-                self._update_quiz_totals(quiz_id)
-                return {"success": True, "data": result.data}
+                quiz = self._update_quiz_totals(quiz_id)
+                return {"success": True,"updated_quiz":quiz, "data": result.data}
             else:
                 return {"success": False, "error": "Failed to create questions"}
                 
@@ -214,14 +214,14 @@ class QuizQuestion:
             # Update in database
             result = self.supabase.table('quiz_questions')\
                 .update(update_data)\
-                .eq('id',  )\
+                .eq('id',  question_id)\
                 .execute()
             
             if result.data:
                 # Update quiz totals if points changed
                 if 'points_weight' in updates:
-                    self._update_quiz_totals(quiz_id)
-                return {"success": True, "data": result.data[0]}
+                    quiz = self._update_quiz_totals(quiz_id)
+                return {"success": True, "updated_quiz":quiz,"data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update question or question not found"}
                 
@@ -247,8 +247,8 @@ class QuizQuestion:
     def _update_quiz_totals(self, quiz_id: str):
         """Update quiz total_questions and total_points"""
         try:
-            from models.quiz import quiz_model
-            quiz_model.update_totals(quiz_id)
+            from app.models.quiz import quiz_model
+            return quiz_model.update_totals(quiz_id)["data"]
         except Exception as e:
             print(f"Warning: Failed to update quiz totals: {e}")
 

@@ -312,8 +312,8 @@ class Quiz:
             # Update quiz totals
             result = self.supabase.table('quizzes')\
                 .update({
-                    'total_questions': total_questions,
-                    'total_points': total_points,
+                    'total_points': int(total_points),
+                    'total_questions': int(total_questions),
                     'updated_at': 'now()'
                 })\
                 .eq('id', quiz_id)\
