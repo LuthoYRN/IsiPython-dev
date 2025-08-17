@@ -81,7 +81,8 @@ def _create_new_quiz(data):
                 quiz_model.delete(quiz_id)
                 return {
                     "success": False,
-                    "error": f"Failed to create questions: {question_result.get('error', question_result.get('errors', 'Unknown error'))}"
+                    "errors": f"Failed to create questions: {question_result.get('errors')}" if question_result.get('errors') else None,
+                    "error": f"Failed to create questions: {question_result.get('error')}" if question_result.get('error') else "Unknown error"
                 }
         
         # STEP 4: If action is publish and we have questions, update status to published

@@ -125,7 +125,8 @@ def _create_new_challenge(data):
                     challenge_model.delete(challenge_id)
                     return {
                         "success": False,
-                        "error": f"Failed to create test case {i + 1}: {test_case_result['error']}"
+                        "errors":f"Failed to create test case {i + 1}: {test_case_result['errors']}" if test_case_result.get("errors") else None,
+                        "error": f"Failed to create test case {i + 1}: {test_case_result['error']}" if test_case_result.get("error") else "Unknown error"
                     }
          # STEP 4: If action is publish and we have test cases, update status to published
         if challenge_data['action'] == 'publish' and created_test_cases:
