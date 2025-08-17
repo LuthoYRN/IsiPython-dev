@@ -170,8 +170,7 @@ class ChallengeSubmission:
                     "data": {
                         "users_attempted": 0,
                         "users_completed": 0,
-                        "pass_rate": 0,
-                        "average_score": 0
+                        "pass_rate": 0
                     }
                 }
             

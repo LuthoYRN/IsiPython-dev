@@ -126,12 +126,11 @@ def get_challenge_details(challenge_id):
         
         if test_cases_result["success"]:
             for test_case in test_cases_result["data"]:
-                # Only include non-hidden test cases and input data
-                if not test_case.get('is_hidden', False):
+                # Only include non-hidden example test cases and input data
+                if not test_case.get('is_hidden', False) and test_case.get('is_example'):
                     student_test_case = {
                         "input_data": test_case["input_data"],
                         "explanation": test_case.get("explanation"),
-                        "is_example": test_case.get("is_example", False),
                         "expected_output":test_case.get("expected_output")
                     }          
                     test_cases.append(student_test_case)
