@@ -38,7 +38,7 @@ KEYWORD_MAP = {
     "okanye_ukuba": "elif"               # If using "okanye" for both `or` and `elif`, disambiguate during parsing
 }
 
-def transpile_code(source_code: str, debug_mode: bool = False) -> tuple[str, dict]:
+def transpile_code(source_code: str, debug_mode: bool = False,challenge_mode: bool = False) -> tuple[str, dict]:
     """
     Transpile IsiPython code into valid Python code, ignoring comments.
     Returns tuple of (transpiled_code, line_mapping)
@@ -68,7 +68,7 @@ def transpile_code(source_code: str, debug_mode: bool = False) -> tuple[str, dic
         transpiled_code, debug_mapping = _add_debug_instrumentation(transpiled_code, line_mapping)
         line_mapping = debug_mapping
 
-    final_code, input_mapping = _convert_input_calls(transpiled_code, line_mapping, debug_mode=debug_mode)
+    final_code, input_mapping = _convert_input_calls(transpiled_code, line_mapping, debug_mode=debug_mode,challenge_mode=challenge_mode)
     
     return final_code, input_mapping
 
@@ -79,7 +79,7 @@ def _substitute_keywords(line: str) -> str:
             line = re.sub(rf'\b{xhosa_kw}\b', py_kw, line)
     return line
 
-def _convert_input_calls(code: str, existing_mapping: dict, debug_mode: bool = False) -> tuple[str, dict]:
+def _convert_input_calls(code: str, existing_mapping: dict, debug_mode: bool = False,challenge_mode:bool=False) -> tuple[str, dict]:
     """
     Convert input("prompt") calls to print("prompt") + input("")
     Preserves indentation and handles complex cases
@@ -105,7 +105,10 @@ def _convert_input_calls(code: str, existing_mapping: dict, debug_mode: bool = F
             indent_str = line[:indentation]
             
             # Create the print statement with same indentation
-            print_line = f'{indent_str}print({quote_char}>>>{prompt_text}{quote_char})'
+            if challenge_mode:
+                print_line = f'{indent_str}print({quote_char}{prompt_text}{quote_char})'
+            else:
+                print_line = f'{indent_str}print({quote_char}>>>{prompt_text}{quote_char})'
             # Replace input("prompt") with input("") in the original line
             new_line = line.replace(f'input({quote_char}{prompt_text}{quote_char})', 'input("")')
             

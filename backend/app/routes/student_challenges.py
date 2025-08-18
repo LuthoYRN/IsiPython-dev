@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.models.challenge import challenge_model
+from app.services.challenge_executor import execute_challenge_submission
 from app.models.challenge_testcase import challenge_test_case_model
 from app.models.challenge_submission import challenge_submission_model
 from app.models.challenge_progress import user_challenge_progress_model
@@ -228,6 +229,82 @@ def get_leaderboard():
                 "challenge_id": challenge_id,
                 "limit": int(limit)
             }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@student_challenges.route('/api/challenges/<challenge_id>/submit', methods=['POST'])
+def submit_challenge_solution(challenge_id):
+    """Submit code solution for a challenge"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        
+        user_id = data.get('user_id')
+        code = data.get('code')
+        
+        # Validate required fields
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+        
+        if not code or not code.strip():
+            return jsonify({"error": "Code is required"}), 400
+        
+        # Verify challenge exists and is published
+        challenge_result = challenge_model.find_by_id(challenge_id)
+        if not challenge_result["success"]:
+            return jsonify({"error": "Challenge not found"}), 404
+        
+        challenge = challenge_result["data"]
+        
+        # Only allow submissions to published challenges
+        if challenge["status"] != "published":
+            return jsonify({"error": "Challenge is not available for submission"}), 403
+        
+        # Execute the submission
+        execution_result = execute_challenge_submission(
+            challenge_id, user_id, code
+        )
+        
+        if not execution_result["success"]:
+            return jsonify({"error": execution_result["error"]}), 500
+        
+        # Return detailed results
+        response_data = {
+            "message": "Code submitted and executed successfully",
+            "submission_id": execution_result["submission_id"],
+            "status": execution_result["status"],
+            "score": execution_result["score"],
+            "tests_passed": execution_result["tests_passed"],
+            "tests_total": execution_result["tests_total"]
+        }
+        if execution_result.get("test_results"):
+            response_data["test_results"] = execution_result["test_results"]
+        
+        return jsonify(response_data), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@student_challenges.route('/api/challenges/<challenge_id>/submissions/<user_id>', methods=['GET'])
+def get_user_challenge_submissions(challenge_id, user_id):
+    """Get user's submission history for a challenge"""
+    try: 
+        limit = request.args.get('limit', 10)
+        
+        submissions_result = challenge_submission_model.find_by_user_and_challenge(
+            user_id, challenge_id, int(limit)
+        )
+        
+        if not submissions_result["success"]:
+            return jsonify({"error": submissions_result["error"]}), 500
+        
+        return jsonify({
+            "message": "Submissions retrieved successfully",
+            "data": submissions_result["data"]
         }), 200
         
     except Exception as e:
