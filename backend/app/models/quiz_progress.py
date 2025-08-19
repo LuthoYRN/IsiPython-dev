@@ -133,6 +133,22 @@ class UserQuizProgress:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    def get_user_progress_since(self, user_id: str, since_date: datetime) -> Dict[str, Any]:
+        """Get user's quiz progress since a specific date"""
+        try:
+            result = self.supabase.table('user_quiz_progress')\
+                .select('*')\
+                .eq('user_id', user_id)\
+                .gte('completed_at', since_date.isoformat())\
+                .execute()
+            
+            if result.data:
+                return {"success": True, "data": result.data}
+            else:
+                return {"success": True, "data": []}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
     def get_quizzes_with_progress(self, user_id: str = None, filters: Dict[str, Any] = None) -> Dict[str, Any]:
         """Get all quizzes with user progress if user_id provided"""
         try:

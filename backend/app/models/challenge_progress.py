@@ -1,5 +1,6 @@
 from app import supabase
 from typing import Optional, List, Dict, Any
+from datetime import datetime
 
 class UserChallengeProgress:
     def __init__(self):
@@ -119,6 +120,23 @@ class UserChallengeProgress:
                 .execute()
             
             return {"success": True, "data": result.data}
+                
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def get_user_progress_since(self, user_id: str, since_date: datetime) -> Dict[str, Any]:
+        """Get user's challenge progress since a specific date"""
+        try:
+            result = self.supabase.table('user_challenge_progress')\
+                .select('*')\
+                .eq('user_id', user_id)\
+                .gte('completed_at', since_date.isoformat())\
+                .execute()
+            
+            if result.data:
+                return {"success": True, "data": result.data}
+            else:
+                return {"success": True, "data": []}
                 
         except Exception as e:
             return {"success": False, "error": str(e)}
