@@ -220,20 +220,6 @@ class UserChallengeProgress:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def reset_progress(self, user_id: str, challenge_id: str) -> Dict[str, Any]:
-        """Reset user's progress on a challenge (admin function)"""
-        try:
-            result = self.supabase.table('user_challenge_progress')\
-                .delete()\
-                .eq('user_id', user_id)\
-                .eq('challenge_id', challenge_id)\
-                .execute()
-            
-            return {"success": True, "message": "Progress reset successfully"}
-            
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-
     def get_leaderboard(self, challenge_id: str = None, limit: int = 50) -> Dict[str, Any]:
         """Get leaderboard for a specific challenge or overall"""
         try:
@@ -248,7 +234,9 @@ class UserChallengeProgress:
                     .limit(limit)\
                     .execute()
             
-            return {"success": True, "data": result.data}
+                return {"success": True, "data": result.data}
+            else:
+                return self.get_global_leaderboard(limit)
                 
         except Exception as e:
             return {"success": False, "error": str(e)}

@@ -50,7 +50,7 @@ def list_challenges():
         user_id = request.args.get('user_id')
         difficulty = request.args.get('difficulty')
         search = request.args.get('search')
-        limit = request.args.get('limit', 20)
+        limit = request.args.get('limit', 100)
         order_by = request.args.get('order_by', 'created_at')
         order_direction = request.args.get('order_direction', 'asc')
         
@@ -208,7 +208,7 @@ def get_leaderboard():
     """Get leaderboard for challenges"""
     try:
         challenge_id = request.args.get('challenge_id')  
-        limit = request.args.get('limit', 50)
+        limit = request.args.get('limit', 500)
         
         if challenge_id:
             # Challenge-specific leaderboard
@@ -293,7 +293,7 @@ def submit_challenge_solution(challenge_id):
 def get_user_challenge_submissions(challenge_id, user_id):
     """Get user's submission history for a challenge"""
     try: 
-        limit = request.args.get('limit', 10)
+        limit = request.args.get('limit', 50)
         
         submissions_result = challenge_submission_model.find_by_user_and_challenge(
             user_id, challenge_id, int(limit)
