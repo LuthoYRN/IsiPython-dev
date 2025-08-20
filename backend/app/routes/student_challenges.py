@@ -252,7 +252,7 @@ def submit_challenge_solution(challenge_id):
         
         if not execution_result["success"]:
             if execution_result.get("validation_error"):  
-                return jsonify({"error": execution_result["validation_error"]}), 400
+                return jsonify({"validation_error": execution_result["validation_error"]}), 400
             return jsonify({"error": execution_result["error"]}), 500
         
         # Return detailed results
