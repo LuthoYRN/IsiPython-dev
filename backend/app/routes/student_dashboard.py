@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
-from datetime import datetime, timedelta
 from app.models.challenge import challenge_model
 from app.models.quiz import quiz_model
 from app.models.challenge_progress import user_challenge_progress_model
 from app.models.quiz_progress import user_quiz_progress_model
+from app.routes.utility import get_week_start
 
 student_dashboard = Blueprint('student_dashboard', __name__)
 
@@ -230,13 +230,6 @@ def get_learning_path():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-def get_week_start():
-    """Get Monday 00:00:00 of current week"""
-    today = datetime.now()
-    days_since_monday = today.weekday()  # 0=Monday, 6=Sunday
-    monday = today - timedelta(days=days_since_monday)
-    return monday.replace(hour=0, minute=0, second=0, microsecond=0)
-
 def balance_items(challenges, quizzes, limit):
     """Balance challenges and quizzes 50/50"""
     if not challenges and not quizzes:
