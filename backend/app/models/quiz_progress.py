@@ -243,9 +243,18 @@ class UserQuizProgress:
         """Get leaderboard for a specific quiz or overall"""
         try:
             if quiz_id:
-                # Quiz-specific leaderboard
+                # Quiz-specific leaderboard with profile data
                 result = self.supabase.table('user_quiz_progress')\
-                    .select('user_id, best_score, best_percentage, completed_at, attempts_count')\
+                    .select('''
+                        user_id, 
+                        best_percentage, 
+                        completed_at, 
+                        attempts_count,
+                        profiles!user_quiz_progress_user_id_fkey(
+                            first_name,
+                            last_name
+                        )
+                    ''')\
                     .eq('quiz_id', quiz_id)\
                     .eq('status', 'completed')\
                     .order('best_percentage', desc=True)\
@@ -253,7 +262,24 @@ class UserQuizProgress:
                     .limit(limit)\
                     .execute()
                 
-                return {"success": True, "data": result.data}
+                leaderboard_data = []
+                rank = 1
+                
+                for entry in result.data:
+                    profile = entry.get('profiles') or {}
+                    
+                    leaderboard_entry = {
+                        'rank': rank,
+                        'user_id': entry['user_id'],
+                        'best_percentage': entry['best_percentage'],
+                        'completed_at': entry['completed_at'],
+                        'attempts_count': entry['attempts_count'],
+                        'full_name': f"{profile.get('first_name', '')} {profile.get('last_name', '')}".strip() or 'Anonymous'
+                    }
+                    leaderboard_data.append(leaderboard_entry)
+                    rank += 1
+                
+                return {"success": True, "data": leaderboard_data}
             else:
                 # Global leaderboard
                 return self.get_global_leaderboard(limit)
@@ -265,7 +291,7 @@ class UserQuizProgress:
         """Get overall leaderboard aggregating all quiz performance"""
         try:
             # Use PostgreSQL aggregation to calculate average score and quiz count per user
-            result = self.supabase.rpc('get_quiz_global_leaderboard', {
+            result = self.supabase.rpc('get_global_quiz_leaderboard', {
                 'limit_count': limit
             }).execute()
             

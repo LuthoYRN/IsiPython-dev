@@ -242,17 +242,43 @@ class UserChallengeProgress:
         """Get leaderboard for a specific challenge or overall"""
         try:
             if challenge_id:
-                # Challenge-specific leaderboard
+                # Challenge-specific leaderboard with profile data
                 result = self.supabase.table('user_challenge_progress')\
-                    .select('user_id, best_score, completed_at, attempts_count')\
+                    .select('''
+                        user_id, 
+                        best_score, 
+                        completed_at, 
+                        attempts_count,
+                        profiles!user_challenge_progress_user_id_fkey(
+                            first_name,
+                            last_name
+                        )
+                    ''')\
                     .eq('challenge_id', challenge_id)\
                     .neq('status', 'not_started')\
                     .order('best_score', desc=True)\
                     .order('completed_at')\
                     .limit(limit)\
                     .execute()
+                
+                leaderboard_data = []
+                rank = 1
+                
+                for entry in result.data:
+                    profile = entry.get('profiles') or {}
+                    
+                    leaderboard_entry = {
+                        'rank': rank,
+                        'user_id': entry['user_id'],
+                        'best_score': entry['best_score'],
+                        'completed_at': entry['completed_at'],
+                        'attempts_count': entry['attempts_count'],
+                        'full_name': f"{profile.get('first_name', '')} {profile.get('last_name', '')}".strip() or 'Anonymous'
+                    }
+                    leaderboard_data.append(leaderboard_entry)
+                    rank += 1
             
-                return {"success": True, "data": result.data}
+                return {"success": True, "data": leaderboard_data}
             else:
                 return self.get_global_leaderboard(limit)
                 
