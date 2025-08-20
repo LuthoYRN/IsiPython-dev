@@ -122,7 +122,16 @@ def run_code():
         if session_id:
             result = execute_python("", "", {}, session_id, user_input)
         else:
-            python_code, line_mapping = transpile_code(isixhosa_code)
+            try:
+                python_code, line_mapping = transpile_code(isixhosa_code)
+            except ValueError as e:
+                result = {
+                    "completed":True,
+                    "output":"",
+                    "english_error":str(e)
+                }
+                result['error'] = translate_error(str(e))
+                return jsonify(result),200
             result = execute_python(isixhosa_code, python_code, line_mapping, session_id, user_input)
 
         if result.get("error"):
@@ -156,8 +165,17 @@ def start_debug():
             return jsonify({"error": "Code is required"}), 400
         
         # Transpile with debug mode enabled
-        python_code, line_mapping = transpile_code(isixhosa_code, debug_mode=True)
-        
+        try:
+            python_code, line_mapping = transpile_code(isixhosa_code, debug_mode=True)
+        except ValueError as e:
+                result = {
+                    "completed":True,
+                    "output":"",
+                    "english_error":str(e)
+                }
+                result['error'] = translate_error(str(e))
+                return jsonify(result),200
+    
         result = execute_python(isixhosa_code, python_code, line_mapping, session_id=None, user_input=None)
 
         if result.get("error"):

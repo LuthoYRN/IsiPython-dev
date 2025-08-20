@@ -31,7 +31,21 @@ def execute_challenge_submission(challenge_id: str, user_id: str, user_code: str
             return {"success": False, "error": "No test cases found for this challenge"}
         
         # STEP 3: Try to transpile the code first
-        python_code, line_mapping = transpile_code(user_code,challenge_mode=True) #challenge_mode
+        try:
+            python_code, line_mapping = transpile_code(user_code,challenge_mode=True) #challenge_mode
+        except ValueError as e:
+            challenge_submission_model.update_results(submission_id, {'status': "error"})
+            user_challenge_progress_model.update_progress(user_id, challenge_id, {
+                'submission_id': submission_id,
+                'status': 'error',
+            }
+            )
+            result = {
+                "success": False,
+                "english_error":str(e),
+            }
+            result['validation_error'] = translate_error(str(e))
+            return (result)
         # STEP 4: Execute against each test case
         visible_results = []
         hidden_results = []

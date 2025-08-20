@@ -35,14 +35,25 @@ KEYWORD_MAP = {
     "ngokulandelelana": "for",     #for i in range()
     "ukusuka": "from",            #from x import y
     "ngu": "is",                #
-    "okanye_ukuba": "elif"               # If using "okanye" for both `or` and `elif`, disambiguate during parsing
+    "okanye_ukuba": "elif"               
+}
+
+# Python keywords that should be forbidden in isiXhosa code
+FORBIDDEN_PYTHON_KEYWORDS = {
+    'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 
+    'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 
+    'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 
+    'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'
 }
 
 def transpile_code(source_code: str, debug_mode: bool = False,challenge_mode: bool = False) -> tuple[str, dict]:
     """
     Transpile IsiPython code into valid Python code, ignoring comments.
+    First validates that only isiXhosa keywords are used.
     Returns tuple of (transpiled_code, line_mapping)
     """
+    validate_isipython_only(source_code)
+
     lines = source_code.splitlines()
     result = []
     line_mapping = {}  # Maps transpiled_line_num -> original_line_num
@@ -72,6 +83,44 @@ def transpile_code(source_code: str, debug_mode: bool = False,challenge_mode: bo
     
     return final_code, input_mapping
 
+def validate_isipython_only(source_code: str) -> None:
+    """
+    Validate that code only uses isiXhosa keywords, not Python keywords.
+    Raises ValueError if Python keywords are found.
+    """
+    lines = source_code.splitlines()
+    
+    for line_num, line in enumerate(lines, 1):
+        # Skip comments entirely
+        if '#' in line:
+            code_part = line.split('#', 1)[0]
+        else:
+            code_part = line
+        
+        # Remove string literals to avoid false positives
+        # Simple regex to remove most string literals
+        clean_line = re.sub(r'"[^"]*"', '', code_part)  # Remove double-quoted strings
+        clean_line = re.sub(r"'[^']*'", '', clean_line)  # Remove single-quoted strings
+        clean_line = re.sub(r'""".*?"""', '', clean_line, flags=re.DOTALL)  # Remove triple-quoted strings
+        clean_line = re.sub(r"'''.*?'''", '', clean_line, flags=re.DOTALL)  # Remove triple-quoted strings
+        
+        # Check for forbidden Python keywords as whole words
+        for py_keyword in FORBIDDEN_PYTHON_KEYWORDS:
+            if re.search(rf'\b{py_keyword}\b', clean_line):
+                # Get the isiXhosa equivalent for helpful error message
+                isixhosa_equivalent = None
+                for xhosa_kw, python_kw in KEYWORD_MAP.items():
+                    if python_kw == py_keyword:
+                        isixhosa_equivalent = xhosa_kw
+                        break
+                
+                if isixhosa_equivalent:
+                    error_msg = f"Line {line_num}: Please use isiXhosa keyword '{isixhosa_equivalent}' instead of Python keyword '{py_keyword}'"
+                else:
+                    error_msg = f"Line {line_num}: Python keyword '{py_keyword}' is not allowed. Please use isiXhosa syntax only."
+                
+                raise ValueError(error_msg)
+            
 def _substitute_keywords(line: str) -> str:
     """Helper: substitute keywords only in code, not comments."""
     for xhosa_kw, py_kw in KEYWORD_MAP.items():

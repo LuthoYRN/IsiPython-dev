@@ -50,12 +50,6 @@ class ChallengeSubmission:
             if 'tests_total' in results:
                 update_data['tests_total'] = int(results['tests_total'])
             
-            if 'error' in results:
-                update_data['error'] = results['error']
-            
-            if 'english_error' in results:
-                update_data['english_error'] = results['english_error']
-            
             # Update in database
             result = self.supabase.table('challenge_submissions')\
                 .update(update_data)\
