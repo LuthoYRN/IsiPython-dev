@@ -1,5 +1,5 @@
 from app import supabase
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict, Any
 import re
 from datetime import datetime
 
@@ -280,6 +280,22 @@ class Quiz:
             else:
                 return {"success": False, "error": "Failed to update quiz or quiz not found"}
                 
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def get_quizzes_published_since(self, since_date: datetime) -> Dict[str, Any]:
+        """Get quizzes published since a specific date"""
+        try:
+            result = supabase.table('quizzes')\
+            .select('*')\
+            .eq('status', 'published')\
+            .gte('published_at', since_date.isoformat())\
+            .execute()
+            
+            if result.data:
+                return {"success": True, "data": result.data}
+            else:
+                return {"success": True, "data": []}
         except Exception as e:
             return {"success": False, "error": str(e)}
 

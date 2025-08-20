@@ -1,5 +1,5 @@
 from app import supabase
-from typing import Optional, List, Dict, Any
+from typing import List, Dict, Any
 
 class QuizQuestion:
     def __init__(self):

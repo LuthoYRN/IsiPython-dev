@@ -1,5 +1,5 @@
 from app import supabase
-from typing import Optional, List, Dict, Any
+from typing import Dict, Any
 from datetime import datetime
 
 class ChallengeSubmission:
@@ -96,6 +96,15 @@ class ChallengeSubmission:
             else:
                 return {"success": False, "error": "Submission not found or access denied"}
                 
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def count_submissions(self):
+        """Get total challenge submissions in the platform"""
+        try:
+            result = supabase.table('challenge_submissions').select('id', count='exact').execute()
+            count = result.count if result.count else 0
+            return {"success": True, "count": count}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
@@ -210,6 +219,21 @@ class ChallengeSubmission:
             
             return {"success": True, "message": "Submission deleted successfully"}
             
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+        
+    def get_challenge_submissions_since(self, since_date: datetime) -> Dict[str, Any]:
+        """Get challenge submissions since a specific date"""
+        try:
+            result = supabase.table('challenge_submissions')\
+            .select('id', count='exact')\
+            .gte('submitted_at', since_date.isoformat())\
+            .execute()
+            
+            if result.data:
+                return {"success": True, "data": result.data}
+            else:
+                return {"success": True, "data": []}
         except Exception as e:
             return {"success": False, "error": str(e)}
 

@@ -1,6 +1,5 @@
-# app/models/quiz_submission.py
 from app import supabase
-from typing import Optional, List, Dict, Any
+from typing import Dict, Any
 from datetime import datetime
 
 class QuizSubmission:
@@ -139,6 +138,15 @@ class QuizSubmission:
             else:
                 return {"success": False, "error": "Submission not found or access denied"}
                 
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def count_submissions(self) -> Dict[str, Any]:
+        """Get number of quiz submissions in the platform"""
+        try:
+            result = supabase.table('quiz_submissions').select('id', count='exact').execute()
+            count = result.count if result.count else 0
+            return {"success": True, "count": count}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
@@ -290,74 +298,89 @@ class QuizSubmission:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-def get_user_quiz_summary(self, user_id: str, quiz_id: str) -> Dict[str, Any]:
-    """Get summary of user's attempts on a quiz"""
-    try:
-        # Get quiz total points
-        quiz_result = self.supabase.table('quizzes')\
-            .select('total_points')\
-            .eq('id', quiz_id)\
+    def get_quiz_submissions_since(self, since_date: datetime) -> Dict[str, Any]:
+        """Get quiz submissions since a specific date"""
+        try:
+            result = supabase.table('quiz_submissions')\
+            .select('id', count='exact')\
+            .gte('submitted_at', since_date.isoformat())\
             .execute()
-        
-        if not quiz_result.data:
-            return {"success": False, "error": "Quiz not found"}
-        
-        total_points = quiz_result.data[0]['total_points']
+            
+            if result.data:
+                return {"success": True, "data": result.data}
+            else:
+                return {"success": True, "data": []}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
-        # Get user's submissions
-        result = self.supabase.table('quiz_submissions')\
-            .select('score, questions_correct, questions_total, submitted_at, time_taken, status')\
-            .eq('user_id', user_id)\
-            .eq('quiz_id', quiz_id)\
-            .order('submitted_at', desc=True)\
-            .execute()
-        
-        if not result.data:
+    def get_user_quiz_summary(self, user_id: str, quiz_id: str) -> Dict[str, Any]:
+        """Get summary of user's attempts on a quiz"""
+        try:
+            # Get quiz total points
+            quiz_result = self.supabase.table('quizzes')\
+                .select('total_points')\
+                .eq('id', quiz_id)\
+                .execute()
+            
+            if not quiz_result.data:
+                return {"success": False, "error": "Quiz not found"}
+            
+            total_points = quiz_result.data[0]['total_points']
+
+            # Get user's submissions
+            result = self.supabase.table('quiz_submissions')\
+                .select('score, questions_correct, questions_total, submitted_at, time_taken, status')\
+                .eq('user_id', user_id)\
+                .eq('quiz_id', quiz_id)\
+                .order('submitted_at', desc=True)\
+                .execute()
+            
+            if not result.data:
+                return {
+                    "success": True,
+                    "data": {
+                        "total_attempts": 0,
+                        "best_score": 0,
+                        "best_percentage": 0,
+                        "status": "not_started",
+                        "latest_attempt": None,
+                        "has_passed": False
+                    }
+                }
+            
+            submissions = result.data
+            
+            # Calculate summary
+            total_attempts = len(submissions)
+            best_score = max(float(sub.get('score', 0)) for sub in submissions)
+            
+            # Calculate best percentage with safety check
+            best_percentage = 0
+            if total_points > 0:
+                for sub in submissions:
+                    score = sub.get('score', 0)
+                    if score > 0:
+                        percentage = (score / total_points) * 100
+                        best_percentage = max(best_percentage, percentage)
+            
+            latest_attempt = submissions[0] if submissions else None
+            
+            has_passed = best_percentage >= 50     
+            
             return {
                 "success": True,
                 "data": {
-                    "total_attempts": 0,
-                    "best_score": 0,
-                    "best_percentage": 0,
-                    "status": "not_started",
-                    "latest_attempt": None,
-                    "has_passed": False
+                    "total_attempts": total_attempts,
+                    "best_score": best_score,
+                    "best_percentage": round(best_percentage, 1),
+                    "status": "completed",
+                    "latest_attempt": latest_attempt,
+                    "has_passed": has_passed
                 }
             }
-        
-        submissions = result.data
-        
-        # Calculate summary
-        total_attempts = len(submissions)
-        best_score = max(float(sub.get('score', 0)) for sub in submissions)
-        
-        # Calculate best percentage with safety check
-        best_percentage = 0
-        if total_points > 0:
-            for sub in submissions:
-                score = sub.get('score', 0)
-                if score > 0:
-                    percentage = (score / total_points) * 100
-                    best_percentage = max(best_percentage, percentage)
-        
-        latest_attempt = submissions[0] if submissions else None
-        
-        has_passed = best_percentage >= 50     
-        
-        return {
-            "success": True,
-            "data": {
-                "total_attempts": total_attempts,
-                "best_score": best_score,
-                "best_percentage": round(best_percentage, 1),
-                "status": "completed",
-                "latest_attempt": latest_attempt,
-                "has_passed": has_passed
-            }
-        }
-            
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+                
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
 # Create instance for use in routes
 quiz_submission_model = QuizSubmission()

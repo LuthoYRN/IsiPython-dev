@@ -20,11 +20,13 @@ def create_app():
     from .routes.student_challenges import student_challenges
     from .routes.student_quizzes import student_quizzes
     from .routes.student_dashboard import student_dashboard
+    from .routes.admin_dashboard import admin_dashboard
     app.register_blueprint(main)
     app.register_blueprint(admin_challenges)
     app.register_blueprint(admin_quizzes)
     app.register_blueprint(student_challenges)
     app.register_blueprint(student_quizzes)
     app.register_blueprint(student_dashboard)
+    app.register_blueprint(admin_dashboard)
 
     return app
