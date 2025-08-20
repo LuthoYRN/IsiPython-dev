@@ -1,6 +1,7 @@
 from app import supabase
 from typing import Dict, Any
 from datetime import datetime
+from functools import lru_cache
 
 class UserChallengeProgress:
     def __init__(self):
@@ -33,6 +34,8 @@ class UserChallengeProgress:
                 .execute()
             
             if create_result.data:
+                self.get_challenges_with_progress.cache_clear()
+                self.get_user_all_progress.cache_clear()
                 return {"success": True, "data": create_result.data[0]}
             else:
                 return {"success": False, "error": "Failed to create progress record"}
@@ -78,6 +81,8 @@ class UserChallengeProgress:
                 .execute()
             
             if result.data:
+                self.get_challenges_with_progress.cache_clear()
+                self.get_user_all_progress.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update progress"}
@@ -111,6 +116,7 @@ class UserChallengeProgress:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @lru_cache(maxsize=200)
     def get_user_all_progress(self, user_id: str) -> Dict[str, Any]:
         """Get user's progress on all challenges"""
         try:
@@ -140,36 +146,13 @@ class UserChallengeProgress:
                 
         except Exception as e:
             return {"success": False, "error": str(e)}
-
-    def get_challenges_with_progress(self, user_id: str = None, filters: Dict[str, Any] = None) -> Dict[str, Any]:
+        
+    @lru_cache(maxsize=200)
+    def get_challenges_with_progress(self, user_id: str = None) -> Dict[str, Any]:
         """Get all challenges with user progress if user_id provided"""
         try:
             # Base query for challenges
-            query = self.supabase.table('challenges').select('*')
-            
-            # Apply filters
-            if filters:
-                if filters.get('status'):
-                    query = query.eq('status', filters['status'])
-                else:
-                    # Default to published challenges for students
-                    query = query.eq('status', 'published')
-                
-                if filters.get('difficulty_level'):
-                    query = query.eq('difficulty_level', filters['difficulty_level'])
-                
-                if filters.get('search'):
-                    search_term = filters['search']
-                    query = query.or_(f'title.ilike.%{search_term}%,short_description.ilike.%{search_term}%')
-            else:
-                # Default to published challenges
-                query = query.eq('status', 'published')
-            
-            # Apply ordering
-            order_by = filters.get('order_by', 'created_at') if filters else 'created_at'
-            query = query.order(order_by)
-            
-            challenges_result = query.execute()
+            challenges_result = self.supabase.table('challenges').select('*').eq('status', 'published').order('created_at').execute()
             
             if not challenges_result.data:
                 return {"success": True, "data": []}

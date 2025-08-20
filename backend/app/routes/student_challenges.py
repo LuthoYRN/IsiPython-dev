@@ -47,28 +47,10 @@ def list_challenges():
     """Get all available challenges with user progress"""
     try:
         # Get query parameters
-        user_id = request.args.get('user_id')
-        difficulty = request.args.get('difficulty')
-        search = request.args.get('search')
-        limit = request.args.get('limit', 100)
-        order_by = request.args.get('order_by', 'created_at')
-        order_direction = request.args.get('order_direction', 'asc')
-        
-        # Build filters
-        filters = {
-            'limit': int(limit),
-            'order_by': order_by,
-            'order_direction': order_direction
-        }
-        
-        if difficulty:
-            filters['difficulty_level'] = difficulty
-        if search:
-            filters['search'] = search
-        
+        user_id = request.args.get('user_id')       
         # Get challenges with user progress
         if user_id:
-            result = user_challenge_progress_model.get_challenges_with_progress(user_id, filters)
+            result = user_challenge_progress_model.get_challenges_with_progress(user_id)
         else:  
             return jsonify({"error": "user_id is required"}), 400
         
@@ -96,8 +78,7 @@ def list_challenges():
             "message": "Challenges retrieved successfully",
             "data": {
                 "challenges": enhanced_challenges,
-                "total_count": len(enhanced_challenges),
-                "filters_applied": filters
+                "total_count": len(enhanced_challenges)
             }
         }), 200
         
