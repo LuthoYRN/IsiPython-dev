@@ -1,6 +1,7 @@
 from app import supabase
 from typing import Dict, Any
 from datetime import datetime
+from functools import lru_cache
 
 class ChallengeSubmission:
     def __init__(self):
@@ -57,13 +58,18 @@ class ChallengeSubmission:
                 .execute()
             
             if result.data:
+                self.get_challenge_statistics.cache_clear()
+                self.find_by_user_and_challenge.cache_clear()
+                self.find_by_user.cache_clear()
+                self.get_user_challenge_summary.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update submission results"}
                 
         except Exception as e:
             return {"success": False, "error": str(e)}
-
+    
+    @lru_cache(maxsize=10)
     def find_by_user_and_challenge(self, user_id: str, challenge_id: str, limit: int = 10) -> Dict[str, Any]:
         """Get user's submissions for a specific challenge"""
         try:
@@ -108,6 +114,7 @@ class ChallengeSubmission:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @lru_cache(maxsize=10)
     def find_by_user(self, user_id: str, limit: int = 50) -> Dict[str, Any]:
         """Get all submissions by a user across all challenges"""
         try:
@@ -157,7 +164,8 @@ class ChallengeSubmission:
                 
         except Exception as e:
             return {"success": False, "error": str(e)}
-
+    
+    @lru_cache(maxsize=200)  # Cache up to 200 challenge statistics 
     def get_challenge_statistics(self, challenge_id: str) -> Dict[str, Any]:
         """Get statistics for a challenge"""
         try:
@@ -236,7 +244,8 @@ class ChallengeSubmission:
                 return {"success": True, "data": []}
         except Exception as e:
             return {"success": False, "error": str(e)}
-
+    
+    @lru_cache(maxsize=10)
     def get_user_challenge_summary(self, user_id: str, challenge_id: str) -> Dict[str, Any]:
         """Get summary of user's attempts on a challenge"""
         try:

@@ -2,6 +2,7 @@ from app import supabase
 from typing import Optional, Dict, Any
 from datetime import datetime
 import re
+from functools import lru_cache
 
 class Challenge:
     def __init__(self):
@@ -154,6 +155,7 @@ class Challenge:
             result = self.supabase.table('challenges').insert(insert_data).execute()
             
             if result.data:
+                self.find_by_id.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to create challenge"}
@@ -203,7 +205,8 @@ class Challenge:
             
         except Exception as e:
             return {"success": False, "error": str(e)}
-
+    
+    @lru_cache(maxsize=500)
     def find_by_id(self, challenge_id: str) -> Dict[str, Any]:
         """Get challenge by ID"""
         try:
@@ -290,6 +293,7 @@ class Challenge:
                 .execute()
             
             if result.data:
+                self.find_by_id.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update challenge or challenge not found"}

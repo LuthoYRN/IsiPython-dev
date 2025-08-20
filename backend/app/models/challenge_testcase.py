@@ -1,5 +1,6 @@
 from app import supabase
 from typing import Dict, Any
+from functools import lru_cache
 
 class ChallengeTestCase:
     def __init__(self):
@@ -74,6 +75,7 @@ class ChallengeTestCase:
             result = self.supabase.table('challenge_test_cases').insert(insert_data).execute()
             
             if result.data:
+                self.find_by_challenge.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to create test case"}
@@ -81,6 +83,7 @@ class ChallengeTestCase:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @lru_cache(maxsize=300)
     def find_by_challenge(self, challenge_id: str) -> Dict[str, Any]:
         """Get all test cases for a challenge"""
         try:
@@ -144,6 +147,7 @@ class ChallengeTestCase:
                 .execute()
             
             if result.data:
+                self.find_by_challenge.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update test case or test case not found"}
