@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.models.challenge import challenge_model
 from app.models.challenge_testcase import challenge_test_case_model
+from app.models.challenge_submission import challenge_submission_model
 
 admin_challenges = Blueprint('admin_challenges', __name__)
 
@@ -239,7 +240,7 @@ def _validate_challenge_for_publishing(test_cases: list = None) -> dict:
 
 @admin_challenges.route('/api/admin/challenges', methods=['GET'])
 def list_challenges():
-    """List all challenges with optional filtering"""
+    """List all challenges with optional filtering and statistics"""
     try:
         # Get query parameters
         filters = {
@@ -256,15 +257,49 @@ def list_challenges():
         filters = {k: v for k, v in filters.items() if v is not None}
         result = challenge_model.find_all(filters)
         
-        if result["success"]:
-            return jsonify({
-                "message": "Challenges retrieved successfully",
-                "data": result["data"],
-                "filters_applied": filters
-            }), 200
-        else:
+        if not result["success"]:
             return jsonify({"error": result["error"]}), 500
+        
+        challenges = result["data"]
+        
+        # Enhance each challenge with submission statistics
+        enhanced_challenges = []
+        for challenge in challenges:
+            challenge_data = {**challenge}
+            # Get submission statistics for this challenge
+            if challenge['status']=="published":
+                stats_result = challenge_submission_model.get_challenge_statistics(challenge['id'])
+                
+                if stats_result["success"]:
+                    stats = stats_result["data"]
+                    challenge_data.update({
+                        "statistics":{
+                            "submissions_count": stats.get("total_submissions", 0),
+                            "users_attempted": stats.get("users_attempted", 0),
+                            "users_completed": stats.get("users_completed", 0),
+                            "pass_rate": stats.get("pass_rate", 0)
+                        }}
+                    )
+                else:
+                    # Fallback if statistics fail
+                    challenge_data.update({
+                        "statistics":{
+                            "submissions_count": 0,
+                            "users_attempted": 0,
+                            "users_completed": 0,
+                            "pass_rate": 0
+                        }}
+                    )
             
+            enhanced_challenges.append(challenge_data)
+        
+        return jsonify({
+            "message": "Challenges retrieved successfully",
+            "data": enhanced_challenges,
+            "filters_applied": filters,
+            "total_count": len(enhanced_challenges)
+        }), 200
+        
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

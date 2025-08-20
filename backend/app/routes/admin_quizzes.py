@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.models.quiz import quiz_model
 from app.models.quiz_question import quiz_question_model
+from app.models.quiz_submission import quiz_submission_model
 
 admin_quizzes = Blueprint('admin_quizzes', __name__)
 
@@ -176,7 +177,7 @@ def _update_existing_quiz(quiz_id, data):
 
 @admin_quizzes.route('/api/admin/quizzes', methods=['GET'])
 def list_quizzes():
-    """List all quizzes with optional filtering"""
+    """List all quizzes with optional filtering and statistics"""
     try:
         # Get query parameters
         filters = {
@@ -192,15 +193,52 @@ def list_quizzes():
         filters = {k: v for k, v in filters.items() if v is not None}
         result = quiz_model.find_all(filters)
         
-        if result["success"]:
-            return jsonify({
-                "message": "Quizzes retrieved successfully",
-                "data": result["data"],
-                "filters_applied": filters
-            }), 200
-        else:
+        if not result["success"]:
             return jsonify({"error": result["error"]}), 500
+        
+        quizzes = result["data"]
+        
+        # Enhance each quiz with submission statistics 
+        enhanced_quizzes = []
+        for quiz in quizzes:
+            quiz_data = {**quiz}
+            if quiz.get('status') == 'published':
+                # Get submission statistics for this quiz
+                stats_result = quiz_submission_model.get_quiz_statistics(quiz['id'])
+                
+                if stats_result["success"]:
+                    stats = stats_result["data"]
+                    quiz_data.update({
+                        "statistics":{
+                            "attempts_count": stats.get("total_submissions", 0),
+                            "users_attempted": stats.get("users_attempted", 0),
+                            "users_passed": stats.get("users_passed", 0),
+                            "average_score": stats.get("average_score", 0),  
+                            "pass_rate": stats.get("pass_rate", 0)
+                        }
+
+                    })
+                else:
+                    # Fallback if statistics fail
+                    quiz_data.update({
+                        "statistics":{
+                            "attempts_count": 0,
+                            "users_attempted": 0,
+                            "users_passed": 0,
+                            "average_score": 0,
+                            "pass_rate": 0
+                        }
+                    })
             
+            enhanced_quizzes.append(quiz_data)
+        
+        return jsonify({
+            "message": "Quizzes retrieved successfully",
+            "data": enhanced_quizzes,
+            "filters_applied": filters,
+            "total_count": len(enhanced_quizzes)
+        }), 200
+        
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
