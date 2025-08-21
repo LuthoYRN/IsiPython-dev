@@ -1,6 +1,7 @@
 from app import supabase
 from typing import Dict, Any
 from datetime import datetime
+from functools import lru_cache
 
 class UserQuizProgress:
     def __init__(self):
@@ -34,6 +35,8 @@ class UserQuizProgress:
                 .execute()
             
             if create_result.data:
+                self.get_quizzes_with_progress.cache_clear()
+                self.get_user_all_progress.cache_clear()
                 return {"success": True, "data": create_result.data[0]}
             else:
                 return {"success": False, "error": "Failed to create progress record"}
@@ -84,6 +87,8 @@ class UserQuizProgress:
                 .execute()
             
             if result.data:
+                self.get_quizzes_with_progress.cache_clear()
+                self.get_user_all_progress.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update progress"}
@@ -119,6 +124,7 @@ class UserQuizProgress:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @lru_cache(maxsize=200)
     def get_user_all_progress(self, user_id: str) -> Dict[str, Any]:
         """Get user's progress on all quizzes"""
         try:
@@ -148,32 +154,12 @@ class UserQuizProgress:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def get_quizzes_with_progress(self, user_id: str = None, filters: Dict[str, Any] = None) -> Dict[str, Any]:
+    @lru_cache(maxsize=200)
+    def get_quizzes_with_progress(self, user_id: str = None) -> Dict[str, Any]:
         """Get all quizzes with user progress if user_id provided"""
         try:
             # Base query for quizzes
-            query = self.supabase.table('quizzes').select('*')
-            
-            # Apply filters
-            if filters:
-                if filters.get('status'):
-                    query = query.eq('status', filters['status'])
-                else:
-                    # Default to published quizzes for students
-                    query = query.eq('status', 'published')
-                
-                if filters.get('search'):
-                    search_term = filters['search']
-                    query = query.or_(f'title.ilike.%{search_term}%,description.ilike.%{search_term}%')
-            else:
-                # Default to published quizzes
-                query = query.eq('status', 'published')
-            
-            # Apply ordering
-            order_by = filters.get('order_by', 'created_at') if filters else 'created_at'
-            query = query.order(order_by)
-            
-            quizzes_result = query.execute()
+            quizzes_result = self.supabase.table('quizzes').select('*').eq('status', 'published').order('created_at').execute()
             
             if not quizzes_result.data:
                 return {"success": True, "data": []}

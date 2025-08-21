@@ -1,6 +1,7 @@
 from app import supabase
 from typing import Dict, Any
 from datetime import datetime
+from functools import lru_cache
 
 class QuizSubmission:
     def __init__(self):
@@ -99,6 +100,10 @@ class QuizSubmission:
                 .execute()
             
             if result.data:
+                self.get_quiz_statistics.cache_clear()
+                self.get_user_quiz_summary.cache_clear()
+                self.find_by_user.cache_clear()
+                self.find_by_user_and_quiz.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update submission results"}
@@ -106,6 +111,7 @@ class QuizSubmission:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @lru_cache(maxsize=10)
     def find_by_user_and_quiz(self, user_id: str, quiz_id: str, limit: int = 10) -> Dict[str, Any]:
         """Get user's submissions for a specific quiz"""
         try:
@@ -150,6 +156,7 @@ class QuizSubmission:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @lru_cache(maxsize=10)
     def find_by_user(self, user_id: str, limit: int = 50) -> Dict[str, Any]:
         """Get all submissions by a user across all quizzes"""
         try:
@@ -199,7 +206,8 @@ class QuizSubmission:
                 
         except Exception as e:
             return {"success": False, "error": str(e)}
-
+        
+    @lru_cache(maxsize=200)  # Cache up to 200 quiz statistics 
     def get_quiz_statistics(self, quiz_id: str) -> Dict[str, Any]:
         """Get statistics for a quiz"""
         try:
@@ -313,6 +321,7 @@ class QuizSubmission:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @lru_cache(maxsize=10)  
     def get_user_quiz_summary(self, user_id: str, quiz_id: str) -> Dict[str, Any]:
         """Get summary of user's attempts on a quiz"""
         try:

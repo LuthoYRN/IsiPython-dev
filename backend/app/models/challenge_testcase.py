@@ -164,6 +164,7 @@ class ChallengeTestCase:
                 .eq('challenge_id', challenge_id)\
                 .execute()
             
+            self.find_by_challenge.cache_clear()
             return {"success": True, "message": "All test cases deleted successfully"}
             
         except Exception as e:

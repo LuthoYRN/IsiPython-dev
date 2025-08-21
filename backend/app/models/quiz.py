@@ -2,6 +2,7 @@ from app import supabase
 from typing import Optional, Dict, Any
 import re
 from datetime import datetime
+from functools import lru_cache
 
 class Quiz:
     def __init__(self):
@@ -158,6 +159,7 @@ class Quiz:
             result = self.supabase.table('quizzes').insert(insert_data).execute()
             
             if result.data:
+                self.find_by_id.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to create quiz"}
@@ -205,6 +207,7 @@ class Quiz:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @lru_cache(maxsize=500)
     def find_by_id(self, quiz_id: str) -> Dict[str, Any]:
         """Get quiz by ID"""
         try:
@@ -276,6 +279,7 @@ class Quiz:
                 .execute()
             
             if result.data:
+                self.find_by_id.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update quiz or quiz not found"}
@@ -336,6 +340,7 @@ class Quiz:
                 .execute()
             
             if result.data:
+                self.find_by_id.cache_clear()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update quiz totals"}

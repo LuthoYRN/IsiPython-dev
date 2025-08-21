@@ -1,5 +1,6 @@
 from app import supabase
 from typing import List, Dict, Any
+from functools import lru_cache
 
 class QuizQuestion:
     def __init__(self):
@@ -78,6 +79,7 @@ class QuizQuestion:
             if result.data:
                 # Update quiz totals
                 quiz = self._update_quiz_totals(quiz_id)
+                self.find_by_quiz.cache_clear()
                 return {"success": True,"updated_quiz":quiz, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to create question"}
@@ -134,6 +136,7 @@ class QuizQuestion:
             if result.data:
                 # Update quiz totals
                 quiz = self._update_quiz_totals(quiz_id)
+                self.find_by_quiz.cache_clear()
                 return {"success": True,"updated_quiz":quiz, "data": result.data}
             else:
                 return {"success": False, "error": "Failed to create questions"}
@@ -141,6 +144,7 @@ class QuizQuestion:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @lru_cache(maxsize=300)
     def find_by_quiz(self, quiz_id: str, include_answers: bool = True) -> Dict[str, Any]:
         """Get all questions for a quiz"""
         try:
@@ -221,6 +225,7 @@ class QuizQuestion:
                 # Update quiz totals if points changed
                 if 'points_weight' in updates:
                     quiz = self._update_quiz_totals(quiz_id)
+                self.find_by_quiz.cache_clear()
                 return {"success": True, "updated_quiz":quiz,"data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update question or question not found"}
@@ -238,6 +243,7 @@ class QuizQuestion:
             
             # Update quiz totals (should be 0 after deleting all)
             self._update_quiz_totals(quiz_id)
+            self.find_by_quiz.cache_clear()
             
             return {"success": True, "message": "All questions deleted successfully"}
             

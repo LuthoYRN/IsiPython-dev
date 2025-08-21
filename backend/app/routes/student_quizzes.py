@@ -50,26 +50,12 @@ def list_quizzes():
     try:
         # Get query parameters
         user_id = request.args.get('user_id')
-        search = request.args.get('search')
-        limit = request.args.get('limit', 100)
-        order_by = request.args.get('order_by', 'created_at')
-        order_direction = request.args.get('order_direction', 'asc')
         
         if not user_id:
             return jsonify({"error": "user_id is required"}), 400
         
-        # Build filters
-        filters = {
-            'limit': int(limit),
-            'order_by': order_by,
-            'order_direction': order_direction
-        }
-        
-        if search:
-            filters['search'] = search
-        
         # Get quizzes with user progress
-        result = user_quiz_progress_model.get_quizzes_with_progress(user_id, filters)
+        result = user_quiz_progress_model.get_quizzes_with_progress(user_id)
         
         if not result["success"]:
             return jsonify({"error": result["error"]}), 500
@@ -126,8 +112,7 @@ def list_quizzes():
             "message": "Quizzes retrieved successfully",
             "data": {
                 "quizzes": enhanced_quizzes,
-                "total_count": len(enhanced_quizzes),
-                "filters_applied": filters
+                "total_count": len(enhanced_quizzes)
             }
         }), 200
         
