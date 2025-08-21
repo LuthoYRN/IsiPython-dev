@@ -7,7 +7,7 @@ class QuizSubmission:
     def __init__(self):
         self.supabase = supabase  # Use the shared instance
 
-    def create(self, quiz_id: str, user_id: str, answers: Dict[str, Any], time_taken: int = 0) -> Dict[str, Any]:
+    def create(self, quiz_id: str, user_id: str, answers: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new quiz submission"""
         try:
             quiz_result = self.supabase.table('quizzes')\
@@ -17,13 +17,6 @@ class QuizSubmission:
             
             if not quiz_result.data:
                 return {"success": False, "errors": "Quiz not found"}
-            
-            quiz = quiz_result.data[0]
-            
-            # Validate time taken
-            if time_taken > quiz["time_limit_minutes"]:
-                return {"success": False, "errors": "Time taken cannot exceed time limit"}
-            
             questions_result = self.supabase.table('quiz_questions')\
                 .select('id')\
                 .eq('quiz_id', quiz_id)\
@@ -53,7 +46,6 @@ class QuizSubmission:
                 'score': 0,  # Will be calculated
                 'questions_correct': 0,
                 'questions_total': 0,
-                'time_taken': time_taken,  # in minutes
                 'status': 'submitted'
             }
             
@@ -338,7 +330,7 @@ class QuizSubmission:
 
             # Get user's submissions
             result = self.supabase.table('quiz_submissions')\
-                .select('score, questions_correct, questions_total, submitted_at, time_taken, status')\
+                .select('score, questions_correct, questions_total, submitted_at, status')\
                 .eq('user_id', user_id)\
                 .eq('quiz_id', quiz_id)\
                 .order('submitted_at', desc=True)\

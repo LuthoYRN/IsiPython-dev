@@ -165,7 +165,6 @@ def submit_quiz(quiz_id):
         
         user_id = data.get('user_id')
         answers = data.get('answers', {})  # {"question_id": "A", ...}
-        time_taken = data.get('time_taken', 0)
         
         if not user_id:
             return jsonify({"error": "User ID is required"}), 400
@@ -177,7 +176,7 @@ def submit_quiz(quiz_id):
         
         quiz = quiz_result["data"]
         # Create submission
-        submission_result = quiz_submission_model.create(quiz_id, user_id, answers, time_taken)
+        submission_result = quiz_submission_model.create(quiz_id, user_id, answers)
         if not submission_result["success"]:
             if submission_result.get("errors"):
                 return jsonify({"error": submission_result["errors"]}), 400
