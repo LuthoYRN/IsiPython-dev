@@ -149,7 +149,7 @@ class QuizQuestion:
                 fields = '*'
             else:
                 # Exclude correct_answer for student-facing queries
-                fields = 'id, quiz_id, question_text, option_a, option_b, option_c, option_d, explanation, points_weight, question_order_idx, created_at'
+                fields = 'id, quiz_id, question_text, option_a, option_b, option_c, option_d, points_weight, question_order_idx, created_at'
             
             result = self.supabase.table('quiz_questions')\
                 .select(fields)\
