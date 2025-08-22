@@ -1,5 +1,6 @@
 from app import supabase
 from typing import Optional, Dict, Any
+from app.routes.utility import clear_quiz_dependent_caches
 import re
 from datetime import datetime
 from functools import lru_cache
@@ -160,6 +161,7 @@ class Quiz:
             
             if result.data:
                 self.find_by_id.cache_clear()
+                clear_quiz_dependent_caches()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to create quiz"}
@@ -280,6 +282,7 @@ class Quiz:
             
             if result.data:
                 self.find_by_id.cache_clear()
+                clear_quiz_dependent_caches()
                 return {"success": True, "data": result.data[0]}
             else:
                 return {"success": False, "error": "Failed to update quiz or quiz not found"}
