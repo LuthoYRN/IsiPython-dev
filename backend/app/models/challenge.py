@@ -327,7 +327,8 @@ class Challenge:
                 .delete()\
                 .eq('id', challenge_id)\
                 .execute()
-            
+            self.find_by_id.cache_clear()
+            clear_challenge_dependent_caches()
             return {"success": True, "message": "Challenge deleted successfully"}
         except Exception as e:
             return {"success": False, "error": str(e)}

@@ -224,6 +224,10 @@ class ChallengeSubmission:
                 query = query.eq('user_id', user_id)
             
             result = query.execute()
+            self.get_challenge_statistics.cache_clear()
+            self.find_by_user_and_challenge.cache_clear()
+            self.find_by_user.cache_clear()
+            self.get_user_challenge_summary.cache_clear()
             
             return {"success": True, "message": "Submission deleted successfully"}
             

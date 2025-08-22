@@ -313,7 +313,8 @@ class Quiz:
                 .delete()\
                 .eq('id', quiz_id)\
                 .execute()
-            
+            self.find_by_id.cache_clear()
+            clear_quiz_dependent_caches()
             return {"success": True, "message": "Quiz deleted successfully"}
             
         except Exception as e:

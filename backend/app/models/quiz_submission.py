@@ -292,6 +292,10 @@ class QuizSubmission:
                 query = query.eq('user_id', user_id)
             
             result = query.execute()
+            self.get_quiz_statistics.cache_clear()
+            self.get_user_quiz_summary.cache_clear()
+            self.find_by_user.cache_clear()
+            self.find_by_user_and_quiz.cache_clear()
             
             return {"success": True, "message": "Submission deleted successfully"}
             
