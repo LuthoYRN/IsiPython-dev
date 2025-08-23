@@ -1,6 +1,6 @@
 from app import supabase
 from typing import Optional, Dict, Any
-from app.routes.utility import clear_quiz_dependent_caches
+from app.routes.utility import clear_quiz_dependent_caches,get_current_sa_time
 import re
 from datetime import datetime
 from functools import lru_cache
@@ -38,8 +38,9 @@ class Quiz:
             try:
                 # Check if it's a future date
                 if isinstance(due_date, str):
-                    due_date_obj = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
-                    if due_date_obj <= datetime.now(due_date_obj.tzinfo):
+                    due_date_obj = datetime.fromisoformat(due_date)
+                    current_time_sa = get_current_sa_time()
+                    if due_date_obj <= current_time_sa:
                         errors['due_date'] = "Due date must be in the future"
             except (ValueError, TypeError):
                 errors['due_date'] = "Due date must be a valid date"

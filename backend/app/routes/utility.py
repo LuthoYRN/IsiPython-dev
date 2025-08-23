@@ -1,11 +1,29 @@
 from datetime import datetime, timedelta
+import pytz
+
+SOUTH_AFRICA_TZ = pytz.timezone('Africa/Johannesburg')
 
 def get_week_start():
     """Get Monday 00:00:00 of current week"""
-    today = datetime.now()
+    today = get_current_sa_time()
     days_since_monday = today.weekday()  # 0=Monday, 6=Sunday
     monday = today - timedelta(days=days_since_monday)
     return monday.replace(hour=0, minute=0, second=0, microsecond=0)
+
+def to_sa_time(dt_str: str):
+    # Parse the timestamp string from DB 
+    dt = datetime.fromisoformat(dt_str)
+
+    # If it has no timezone info, assume it was UTC
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=pytz.UTC)
+
+    # Convert to South African time
+    return dt.astimezone(SOUTH_AFRICA_TZ).isoformat()
+
+def get_current_sa_time() -> datetime:
+    """Get current time in SA timezone"""
+    return datetime.now(SOUTH_AFRICA_TZ)
 
 def clear_challenge_dependent_caches():
     """

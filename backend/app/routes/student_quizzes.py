@@ -4,6 +4,7 @@ from app.models.quiz import quiz_model
 from app.models.quiz_question import quiz_question_model
 from app.models.quiz_submission import quiz_submission_model
 from app.models.quiz_progress import user_quiz_progress_model
+from app.routes.utility import get_current_sa_time,to_sa_time
 
 student_quizzes = Blueprint('student_quizzes', __name__)
 
@@ -74,8 +75,9 @@ def list_quizzes():
             else:
                 status = 'available'
                 if quiz['due_date']:
-                    due_date = datetime.fromisoformat(quiz['due_date'].replace('Z', '+00:00'))
-                    if datetime.now(due_date.tzinfo) > due_date:
+                    due_date_str = to_sa_time(quiz['due_date'])
+                    due_date = datetime.fromisoformat(due_date_str.replace('Z', ''))
+                    if get_current_sa_time() > due_date:
                         status = 'overdue'
             
             quiz_data = {
