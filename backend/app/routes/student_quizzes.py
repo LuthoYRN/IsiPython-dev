@@ -66,7 +66,8 @@ def list_quizzes():
         # For each quiz, get class statistics
         enhanced_quizzes = []
         for quiz in quizzes:
-            quiz_stats = quiz_submission_model.get_quiz_statistics(quiz['id'])
+            total_points = quiz.get('total_points', 0)
+            quiz_stats = quiz_submission_model.get_quiz_statistics(quiz['id'],total_points)
             
             # Determine status based on user progress
             user_progress = quiz.get('user_progress', {})

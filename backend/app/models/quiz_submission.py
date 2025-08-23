@@ -201,19 +201,22 @@ class QuizSubmission:
         except Exception as e:
             return {"success": False, "error": str(e)}
         
-    @lru_cache(maxsize=200)  # Cache up to 200 quiz statistics 
-    def get_quiz_statistics(self, quiz_id: str) -> Dict[str, Any]:
+    @lru_cache(maxsize=200)  
+    def get_quiz_statistics(self, quiz_id: str, total_points: int = None) -> Dict[str, Any]:
         """Get statistics for a quiz"""
         try:
-            quiz_result = self.supabase.table('quizzes')\
-                .select('total_points')\
-                .eq('id', quiz_id)\
-                .execute()
+            # If total_points not provided, we still need to query (fallback)
+            if total_points is None:
+                quiz_result = self.supabase.table('quizzes')\
+                    .select('total_points')\
+                    .eq('id', quiz_id)\
+                    .execute()
+                
+                if not quiz_result.data:
+                    return {"success": False, "error": "Quiz not found"}
+                
+                total_points = quiz_result.data[0]['total_points']
             
-            if not quiz_result.data:
-                return {"success": False, "error": "Quiz not found"}
-            
-            total_points = quiz_result.data[0]['total_points']
             # Get all submissions for this quiz
             all_submissions = self.supabase.table('quiz_submissions')\
                 .select('user_id, score, questions_correct, questions_total')\
@@ -228,7 +231,6 @@ class QuizSubmission:
                         "users_attempted": 0,
                         "users_passed": 0,
                         "pass_rate": 0,
-                        "average_score": 0
                     }
                 }
             
@@ -264,12 +266,7 @@ class QuizSubmission:
             
             # Calculate pass rate
             pass_rate = (users_passed / users_attempted * 100) if users_attempted > 0 else 0
-            
-            # Calculate average scores based on best attempts 
-            scores = [sub.get('score', 0) for sub in user_best_submissions.values()]
-            average_score = sum(scores) / len(scores) if scores else 0
-            average_score = (average_score / total_points) * 100 if total_points > 0 and average_score > 0 else 0
-            
+
             return {
                 "success": True,
                 "data": {
@@ -277,7 +274,6 @@ class QuizSubmission:
                     "users_attempted": users_attempted,
                     "users_passed": users_passed,
                     "pass_rate": round(pass_rate, 1),
-                    "average_score": round(average_score, 1)
                 }
             }
                 
