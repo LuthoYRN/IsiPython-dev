@@ -66,6 +66,11 @@ def list_quizzes():
         # For each quiz, get class statistics
         enhanced_quizzes = []
         for quiz in quizzes:
+            if quiz['due_date']:
+                due_date_str = to_sa_time(quiz['due_date'])
+                due_date = datetime.fromisoformat(due_date_str.replace('Z', ''))
+                if get_current_sa_time() > due_date:
+                    continue
             total_points = quiz.get('total_points', 0)
             quiz_stats = quiz_submission_model.get_quiz_statistics(quiz['id'],total_points)
             
@@ -75,11 +80,6 @@ def list_quizzes():
                 status = 'completed'
             else:
                 status = 'available'
-                if quiz['due_date']:
-                    due_date_str = to_sa_time(quiz['due_date'])
-                    due_date = datetime.fromisoformat(due_date_str.replace('Z', ''))
-                    if get_current_sa_time() > due_date:
-                        continue
             
             quiz_data = {
                 # Quiz info
