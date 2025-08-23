@@ -79,7 +79,7 @@ def list_quizzes():
                     due_date_str = to_sa_time(quiz['due_date'])
                     due_date = datetime.fromisoformat(due_date_str.replace('Z', ''))
                     if get_current_sa_time() > due_date:
-                        status = 'overdue'
+                        continue
             
             quiz_data = {
                 # Quiz info
