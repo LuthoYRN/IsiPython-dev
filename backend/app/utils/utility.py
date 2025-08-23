@@ -44,7 +44,9 @@ def clear_challenge_dependent_caches():
         # Clear challenge submission caches
         if hasattr(challenge_submission_model, 'find_by_user'):
             challenge_submission_model.find_by_user.cache_clear()
-            
+
+        if hasattr(challenge_submission_model,'get_batch_challenge_statistics_rpc'):
+            challenge_submission_model.get_batch_challenge_statistics_rpc.cache_clear()    
         return {"success": True, "message": "Challenge dependent caches cleared"}
         
     except Exception as e:
@@ -67,9 +69,8 @@ def clear_quiz_dependent_caches():
         if hasattr(user_quiz_progress_model, 'get_user_all_progress'):
             user_quiz_progress_model.get_user_all_progress.cache_clear()
         
-        # Clear quiz submission caches
-        if hasattr(quiz_submission_model, 'get_quiz_statistics'):
-            quiz_submission_model.get_quiz_statistics.cache_clear()
+        if hasattr(quiz_submission_model, 'get_batch_quiz_statistics_rpc'):
+            quiz_submission_model.get_batch_quiz_statistics_rpc.cache_clear()
             
         # Clear quiz submission caches
         if hasattr(quiz_submission_model, 'get_user_quiz_summary'):

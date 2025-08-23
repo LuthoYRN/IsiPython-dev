@@ -3,7 +3,7 @@ from app.models.challenge import challenge_model
 from app.models.quiz import quiz_model
 from app.models.challenge_progress import user_challenge_progress_model
 from app.models.quiz_progress import user_quiz_progress_model
-from app.routes.utility import get_week_start
+from app.utils.utility import get_week_start
 
 student_dashboard = Blueprint('student_dashboard', __name__)
 

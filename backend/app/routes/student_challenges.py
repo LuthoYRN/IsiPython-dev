@@ -59,18 +59,33 @@ def list_challenges():
         
         challenges = result["data"]
         
-        # For each challenge, get additional statistics (pass rate, users completed)
+        if not challenges:
+            return jsonify({
+                "message": "No challenges available",
+                "data": {"challenges": [], "total_count": 0}
+            }), 200
+        
+        import json
+        challenge_ids = [challenge['id'] for challenge in challenges]
+        batch_stats_result = challenge_submission_model.get_batch_challenge_statistics_rpc(
+            json.dumps(challenge_ids, sort_keys=True)  # Sorted for consistent caching
+        )
+        
+        batch_stats = batch_stats_result.get("data", {}) if batch_stats_result.get("success") else {}
+        
+        # For each challenge, get statistics
         enhanced_challenges = []
         for challenge in challenges:
-            challenge_stats = challenge_submission_model.get_challenge_statistics(challenge['id'])
+            challenge_id = challenge['id']
+            challenge_stats = batch_stats.get(challenge_id,{
+                "users_attempted":0,
+                "users_completed":0,
+                "pass_rate":0
+            })
             
             challenge_data = {
                 **challenge,
-                "statistics": challenge_stats["data"] if challenge_stats["success"] else {
-                    "users_attempted": 0,
-                    "users_completed": 0, 
-                    "pass_rate": 0
-                }
+                "statistics": challenge_stats
             }
             enhanced_challenges.append(challenge_data)
         

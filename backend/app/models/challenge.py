@@ -1,7 +1,7 @@
 from app import supabase
 from typing import Optional, Dict, Any
 from datetime import datetime
-from app.routes.utility import clear_challenge_dependent_caches
+from app.utils.utility import clear_challenge_dependent_caches
 import re
 from functools import lru_cache
 

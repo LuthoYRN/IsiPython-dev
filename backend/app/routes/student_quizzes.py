@@ -4,7 +4,7 @@ from app.models.quiz import quiz_model
 from app.models.quiz_question import quiz_question_model
 from app.models.quiz_submission import quiz_submission_model
 from app.models.quiz_progress import user_quiz_progress_model
-from app.routes.utility import get_current_sa_time,to_sa_time
+from app.utils.utility import get_current_sa_time,to_sa_time
 
 student_quizzes = Blueprint('student_quizzes', __name__)
 
@@ -63,17 +63,39 @@ def list_quizzes():
         
         quizzes = result["data"]
         
-        # For each quiz, get class statistics
-        enhanced_quizzes = []
+        active_quizzes = []
         for quiz in quizzes:
             if quiz['due_date']:
                 due_date_str = to_sa_time(quiz['due_date'])
                 due_date = datetime.fromisoformat(due_date_str.replace('Z', ''))
                 if get_current_sa_time() > due_date:
                     continue
-            total_points = quiz.get('total_points', 0)
-            quiz_stats = quiz_submission_model.get_quiz_statistics(quiz['id'],total_points)
+            active_quizzes.append(quiz)
+        
+        if not active_quizzes:
+            return jsonify({
+                "message": "No active quizzes available",
+                "data": {"quizzes": [], "total_count": 0}
+            }), 200
+
+        # For each quiz, get class statistics
+        import json
+        quiz_ids = [quiz['id'] for quiz in active_quizzes]
+        batch_stats_result = quiz_submission_model.get_batch_quiz_statistics_rpc(
+            json.dumps(quiz_ids, sort_keys=True)  # Sorted for consistent caching
+        )
+        
+        batch_stats = batch_stats_result.get("data", {}) if batch_stats_result.get("success") else {}
+        
+        enhanced_quizzes = []
+        for quiz in active_quizzes:
+            quiz_id = quiz['id']
             
+            quiz_stats = batch_stats.get(quiz_id, {
+                "users_attempted": 0,
+                "users_passed": 0,
+                "pass_rate": 0,
+            })
             # Determine status based on user progress
             user_progress = quiz.get('user_progress', {})
             if user_progress.get('status') == 'completed':
@@ -95,13 +117,11 @@ def list_quizzes():
                 "status": status,
                 
                 # Class statistics
-                "class_statistics": quiz_stats["data"] if quiz_stats["success"] else {
-                    "users_attempted": 0,
-                    "users_passed": 0,
-                    "pass_rate": 0,
-                    "average_score": 0
+                "class_statistics": {
+                    "users_attempted": quiz_stats["users_attempted"],
+                    "users_passed": quiz_stats["users_passed"],
+                    "pass_rate": quiz_stats["pass_rate"]
                 },
-                
                 # User performance
                 "user_performance": {
                     "best_score": user_progress.get('best_score', 0),

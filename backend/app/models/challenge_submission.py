@@ -58,7 +58,7 @@ class ChallengeSubmission:
                 .execute()
             
             if result.data:
-                self.get_challenge_statistics.cache_clear()
+                self.get_batch_challenge_statistics_rpc.cache_clear()
                 self.find_by_user_and_challenge.cache_clear()
                 self.find_by_user.cache_clear()
                 self.get_user_challenge_summary.cache_clear()
@@ -167,56 +167,46 @@ class ChallengeSubmission:
         except Exception as e:
             return {"success": False, "error": str(e)}
     
-    @lru_cache(maxsize=200)  # Cache up to 200 challenge statistics 
-    def get_challenge_statistics(self, challenge_id: str) -> Dict[str, Any]:
-        """Get statistics for a challenge"""
+    @lru_cache(maxsize=50)
+    def get_batch_challenge_statistics_rpc(self, challenge_ids_str: str) -> Dict[str, Any]:
+        """Get challenge statistics using Supabase RPC function"""
         try:
-            # Get all submissions for this challenge
-            all_submissions = self.supabase.table('challenge_submissions')\
-                .select('user_id, status, score')\
-                .eq('challenge_id', challenge_id)\
-                .execute()
+            import json
+            challenge_ids = json.loads(challenge_ids_str)
             
-            if not all_submissions.data:
-                return {
-                    "success": True,
-                    "data": {
+            if not challenge_ids:
+                return {"success": True, "data": {}}
+            
+            result = self.supabase.rpc('get_challenge_batch_statistics', {
+                'challenge_ids': challenge_ids
+            }).execute()
+            
+            if not result.data:
+                # Return empty stats for all challenges
+                empty_stats = {
+                    challenge_id: {
                         "users_attempted": 0,
                         "users_completed": 0,
-                        "pass_rate": 0
-                    }
+                        "pass_rate": 0,
+                    } for challenge_id in challenge_ids
+                }
+                return {"success": True, "data": empty_stats}
+            
+            # Convert to expected format
+            stats_dict = {}
+            for row in result.data:
+                stats_dict[row['challenge_id']] = {
+                    "users_attempted": int(row['users_attempted']),
+                    "users_completed": int(row['users_completed']),
+                    "pass_rate": float(row['pass_rate']),
                 }
             
-            submissions = all_submissions.data
+            return {"success": True, "data": stats_dict}
             
-            # Get unique users who attempted this challenge
-            total_submissions = len(submissions)
-            unique_users = set(sub['user_id'] for sub in submissions)
-            users_attempted = len(unique_users)
-            
-            # Get users who passed (have at least one passing submission)
-            users_with_passing_submissions = set(
-                sub['user_id'] for sub in submissions if sub['status'] == 'passed'
-            )
-            users_completed = len(users_with_passing_submissions)
-            
-            # Calculate pass rate based on users
-            pass_rate = (users_completed / users_attempted * 100) if users_attempted > 0 else 0
-            
-            return {
-                "success": True,
-                "data": {
-                    "total_submissions":total_submissions,
-                    "users_attempted": users_attempted,      # Total unique users who tried
-                    "users_completed": users_completed,      # Users who successfully passed
-                    "pass_rate": round(pass_rate, 1),        # % of users who passed
-                }
-            }
-                
         except Exception as e:
-            self.get_challenge_statistics.cache_clear()
+            self.get_batch_challenge_statistics_rpc.cache_clear()
             return {"success": False, "error": str(e)}
-        
+                
     def delete(self, submission_id: str, user_id: str = None) -> Dict[str, Any]:
         """Delete a submission (with optional user check for security)"""
         try:
@@ -227,7 +217,7 @@ class ChallengeSubmission:
                 query = query.eq('user_id', user_id)
             
             result = query.execute()
-            self.get_challenge_statistics.cache_clear()
+            self.get_batch_challenge_statistics_rpc.cache_clear()
             self.find_by_user_and_challenge.cache_clear()
             self.find_by_user.cache_clear()
             self.get_user_challenge_summary.cache_clear()

@@ -92,7 +92,7 @@ class QuizSubmission:
                 .execute()
             
             if result.data:
-                self.get_quiz_statistics.cache_clear()
+                self.get_batch_quiz_statistics_rpc.cache_clear()
                 self.get_user_quiz_summary.cache_clear()
                 self.find_by_user.cache_clear()
                 self.find_by_user_and_quiz.cache_clear()
@@ -200,87 +200,47 @@ class QuizSubmission:
                 
         except Exception as e:
             return {"success": False, "error": str(e)}
-        
-    @lru_cache(maxsize=200)  
-    def get_quiz_statistics(self, quiz_id: str, total_points: int = None) -> Dict[str, Any]:
-        """Get statistics for a quiz"""
+
+    @lru_cache(maxsize=50)
+    def get_batch_quiz_statistics_rpc(self, quiz_ids_str: str) -> Dict[str, Any]:
+        """Get quiz statistics using Supabase RPC function"""
         try:
-            # If total_points not provided, we still need to query (fallback)
-            if total_points is None:
-                quiz_result = self.supabase.table('quizzes')\
-                    .select('total_points')\
-                    .eq('id', quiz_id)\
-                    .execute()
-                
-                if not quiz_result.data:
-                    return {"success": False, "error": "Quiz not found"}
-                
-                total_points = quiz_result.data[0]['total_points']
+            import json
+            quiz_ids = json.loads(quiz_ids_str)
             
-            # Get all submissions for this quiz
-            all_submissions = self.supabase.table('quiz_submissions')\
-                .select('user_id, score, questions_correct, questions_total')\
-                .eq('quiz_id', quiz_id)\
-                .execute()
+            if not quiz_ids:
+                return {"success": True, "data": {}}
             
-            if not all_submissions.data:
-                return {
-                    "success": True,
-                    "data": {
-                        "total_submissions": 0,
+            result = self.supabase.rpc('get_quiz_batch_statistics', {
+                'quiz_ids': quiz_ids
+            }).execute()
+            
+            if not result.data:
+                # Return empty stats for all quizzes
+                empty_stats = {
+                    quiz_id: {
                         "users_attempted": 0,
                         "users_passed": 0,
                         "pass_rate": 0,
-                    }
+                    } for quiz_id in quiz_ids
+                }
+                return {"success": True, "data": empty_stats}
+            
+            # Convert to expected format
+            stats_dict = {}
+            for row in result.data:
+                stats_dict[row['quiz_id']] = {
+                    "users_attempted": int(row['users_attempted']),
+                    "users_passed": int(row['users_passed']),
+                    "pass_rate": float(row['pass_rate']),
                 }
             
-            submissions = all_submissions.data
+            return {"success": True, "data": stats_dict}
             
-            # Get unique users who attempted this quiz
-            total_submissions = len(submissions)
-            unique_users = set(sub['user_id'] for sub in submissions)
-            users_attempted = len(unique_users)
-            
-            # Calculate best submission per user for pass rate
-            user_best_submissions = {}
-            for sub in submissions:
-                user_id = sub['user_id']
-                if user_id not in user_best_submissions:
-                    user_best_submissions[user_id] = sub
-                else:
-                    # Keep the best score submission for each user
-                    if sub.get('score', 0) > user_best_submissions[user_id].get('score', 0):
-                        user_best_submissions[user_id] = sub
-            
-            # Count users who passed (>=50% on their best attempt) 
-            users_passed = 0
-            
-            for user_id, best_sub in user_best_submissions.items():
-                score = best_sub.get('score', 0)
-                
-                # Calculate percentage for this user's best attempt
-                percentage = (score / total_points) * 100 if total_points > 0 and score > 0 else 0
-                
-                if percentage >= 50:
-                    users_passed += 1
-            
-            # Calculate pass rate
-            pass_rate = (users_passed / users_attempted * 100) if users_attempted > 0 else 0
-
-            return {
-                "success": True,
-                "data": {
-                    "total_submissions": total_submissions,
-                    "users_attempted": users_attempted,
-                    "users_passed": users_passed,
-                    "pass_rate": round(pass_rate, 1),
-                }
-            }
-                
         except Exception as e:
-            self.get_quiz_statistics.cache_clear()
+            self.get_batch_quiz_statistics_rpc.cache_clear()
             return {"success": False, "error": str(e)}
-        
+  
     def delete(self, submission_id: str, user_id: str = None) -> Dict[str, Any]:
         """Delete a submission (with optional user check for security)"""
         try:
@@ -291,7 +251,7 @@ class QuizSubmission:
                 query = query.eq('user_id', user_id)
             
             result = query.execute()
-            self.get_quiz_statistics.cache_clear()
+            self.get_batch_quiz_statistics_rpc.cache_clear()
             self.get_user_quiz_summary.cache_clear()
             self.find_by_user.cache_clear()
             self.find_by_user_and_quiz.cache_clear()

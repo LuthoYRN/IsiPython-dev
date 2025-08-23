@@ -1,6 +1,6 @@
 from app import supabase
 from typing import Optional, Dict, Any
-from app.routes.utility import clear_quiz_dependent_caches,get_current_sa_time
+from app.utils.utility import clear_quiz_dependent_caches,get_current_sa_time
 import re
 from datetime import datetime
 from functools import lru_cache

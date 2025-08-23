@@ -4,7 +4,7 @@ from app.models.quiz import quiz_model
 from app.models.challenge_submission import challenge_submission_model
 from app.models.student import student_model
 from app.models.quiz_submission import quiz_submission_model
-from app.routes.utility import get_week_start
+from app.utils.utility import get_week_start
 
 admin_dashboard = Blueprint('admin_dashboard', __name__)
 
