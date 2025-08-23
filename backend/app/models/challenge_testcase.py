@@ -96,6 +96,7 @@ class ChallengeTestCase:
             return {"success": True, "data": result.data}
                 
         except Exception as e:
+            self.find_by_challenge.cache_clear()
             return {"success": False, "error": str(e)}
 
     def find_by_id(self, test_case_id: str) -> Dict[str, Any]:

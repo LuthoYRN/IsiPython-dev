@@ -118,6 +118,7 @@ class QuizSubmission:
             return {"success": True, "data": result.data}
                 
         except Exception as e:
+            self.find_by_user_and_quiz.cache_clear()
             return {"success": False, "error": str(e)}
 
     def find_by_id(self, submission_id: str, user_id: str = None) -> Dict[str, Any]:
@@ -162,6 +163,7 @@ class QuizSubmission:
             return {"success": True, "data": result.data}
                 
         except Exception as e:
+            self.find_by_user.cache_clear()
             return {"success": False, "error": str(e)}
 
     def find_by_quiz(self, quiz_id: str, limit: int = 100) -> Dict[str, Any]:
@@ -280,6 +282,7 @@ class QuizSubmission:
             }
                 
         except Exception as e:
+            self.get_quiz_statistics.cache_clear()
             return {"success": False, "error": str(e)}
         
     def delete(self, submission_id: str, user_id: str = None) -> Dict[str, Any]:
@@ -385,6 +388,7 @@ class QuizSubmission:
             }
                 
         except Exception as e:
+            self.get_user_quiz_summary.cache_clear()
             return {"success": False, "error": str(e)}
 
 # Create instance for use in routes

@@ -225,6 +225,8 @@ class Quiz:
                 return {"success": False, "error": "Quiz not found"}
                 
         except Exception as e:
+            self.find_by_id.cache_clear()
+            clear_quiz_dependent_caches()
             return {"success": False, "error": str(e)}
 
     def update(self, quiz_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:

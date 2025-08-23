@@ -223,6 +223,8 @@ class Challenge:
                 return {"success": False, "error": "Challenge not found"}
                 
         except Exception as e:
+            self.find_by_id.cache_clear()
+            clear_challenge_dependent_caches()
             return {"success": False, "error": str(e)}
 
     def find_by_slug(self, slug: str) -> Dict[str, Any]:

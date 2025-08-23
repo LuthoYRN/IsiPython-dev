@@ -128,6 +128,7 @@ class UserChallengeProgress:
             return {"success": True, "data": result.data}
                 
         except Exception as e:
+            self.get_user_all_progress.cache_clear()
             return {"success": False, "error": str(e)}
     
     def get_user_progress_since(self, user_id: str, since_date: datetime) -> Dict[str, Any]:
@@ -187,6 +188,7 @@ class UserChallengeProgress:
             return {"success": True, "data": challenges}
                 
         except Exception as e:
+            self.get_challenges_with_progress.cache_clear()
             return {"success": False, "error": str(e)}
 
     def get_user_dashboard_stats(self, user_id: str) -> Dict[str, Any]:
