@@ -7,8 +7,6 @@ import queue
 import time
 from typing import Optional, Dict, Any
 
-from requests import session
-
 class ExecutionSession:
     def __init__(self, session_id: str):
         self.session_id = session_id

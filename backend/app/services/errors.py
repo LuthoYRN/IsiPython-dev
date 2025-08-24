@@ -23,7 +23,7 @@ KEYWORD MAPPINGS (Python → isiXhosa):
 - import → ngenisa
 - from → ukusuka  
 - if → ukuba
-- while → ngexesha
+- while → ngelixa
 - def → chaza
 - for → ngokulandelelana
 - else → enye
@@ -41,7 +41,7 @@ KEYWORD MAPPINGS (Python → isiXhosa):
 - except → ngaphandle
 - finally → ekugqibeleni
 - with → nge
-- as → njenga
+- as → njenge
 - class → iklasi
 - pass → dlula
 - raise → phakamisa
@@ -199,7 +199,7 @@ KEYWORD MAPPINGS (Python → isiXhosa):
 - import → ngenisa
 - from → ukusuka  
 - if → ukuba
-- while → ngexesha
+- while → ngelixa
 - def → chaza
 - for → ngokulandelelana
 - else → enye
@@ -217,7 +217,7 @@ KEYWORD MAPPINGS (Python → isiXhosa):
 - except → ngaphandle
 - finally → ekugqibeleni
 - with → nge
-- as → njenga
+- as → njenge
 - class → iklasi
 - pass → dlula
 - raise → phakamisa
@@ -264,9 +264,9 @@ CRITICAL ISIXHOSA PREFIX AGREEMENT RULES:
 TIMEOUT ANALYSIS FRAMEWORK:
 
 1. INFINITE LOOP PATTERNS:
-  - "ngexesha Inyaniso:" (while True:) without yekisa (break)
-  - Counters that never change: i = 0; ngexesha i < 10: [no i = i + 1]
-  - Wrong conditions: ngexesha x > 0: x = x + 1 (makes x bigger, not smaller)
+  - "ngelixa Inyaniso:" (while True:) without yekisa (break)
+  - Counters that never change: i = 0; ngelixa i < 10: [no i = i + 1]
+  - Wrong conditions: ngelixa x > 0: x = x + 1 (makes x bigger, not smaller)
 
 2. SLOW CODE PATTERNS:
   - Nested loops with large ranges
@@ -287,13 +287,13 @@ For missing increments:
 EXAMPLE RESPONSES:
 
 Example 1 - While True without break:
-"Umjikelo wakho kumgca 3 ongu *ngexesha Inyaniso* awunasiphelo. Yongeza igama elithi *yekisa* xa ufuna ukumisa umjikelo."
+"Umjikelo wakho kumgca 3 ongu *ngelixa Inyaniso* awunasiphelo. Yongeza igama elithi *yekisa* xa ufuna ukumisa umjikelo."
 
 Example 2 - Missing counter increment:
 "Ulibele ukwandisa i kumgca 5. Yongeza 'i = i + 1' ngaphakathi komjikelo ukuze i-counter inyuke."
 
 Example 3 - Wrong condition:
-"Umjikelo wakho kumgca 2 ongu *ngexesha x > 0* awuyi kuphela kuba u-x uyanda. Tshintsha ibengu 'x = x - 1' ukuze u-x ahlе."
+"Umjikelo wakho kumgca 2 ongu *ngelixa x > 0* awuyi kuphela kuba u-x uyanda. Tshintsha ibengu 'x = x - 1' ukuze u-x ahlе."
 
 Example 4 - Slow algorithm:
 "Ikhowudi yakho iyacotha kakhulu mpela xa ifika kumgca 4. Zama indlela elula yokufuna le nto."
