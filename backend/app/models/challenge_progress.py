@@ -2,6 +2,7 @@ from app import supabase
 from typing import Dict, Any
 from datetime import datetime
 from functools import lru_cache
+from app.utils.retry import retry_with_backoff  
 
 class UserChallengeProgress:
     def __init__(self):
@@ -116,6 +117,7 @@ class UserChallengeProgress:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @retry_with_backoff(max_retries=3, base_delay=0.3)
     @lru_cache(maxsize=200)
     def get_user_all_progress(self, user_id: str) -> Dict[str, Any]:
         """Get user's progress on all challenges"""
@@ -129,7 +131,13 @@ class UserChallengeProgress:
                 
         except Exception as e:
             self.get_user_all_progress.cache_clear()
-            return {"success": False, "error": str(e)}
+            error_str = str(e).lower()
+            if ("resource temporarily unavailable" in error_str or 
+                "connection" in error_str or
+                "temporarily unavailable" in error_str):
+                raise  
+            else:
+                return {"success": False, "error": str(e)}
     
     def get_user_progress_since(self, user_id: str, since_date: datetime) -> Dict[str, Any]:
         """Get user's challenge progress since a specific date"""
@@ -148,6 +156,7 @@ class UserChallengeProgress:
         except Exception as e:
             return {"success": False, "error": str(e)}
         
+    @retry_with_backoff(max_retries=5, base_delay=0.3)
     @lru_cache(maxsize=200)
     def get_challenges_with_progress(self, user_id: str = None) -> Dict[str, Any]:
         """Get all challenges with user progress if user_id provided"""
@@ -189,7 +198,13 @@ class UserChallengeProgress:
                 
         except Exception as e:
             self.get_challenges_with_progress.cache_clear()
-            return {"success": False, "error": str(e)}
+            error_str = str(e).lower()
+            if ("resource temporarily unavailable" in error_str or 
+                "connection" in error_str or
+                "temporarily unavailable" in error_str):
+                raise  
+            else:
+                return {"success": False, "error": str(e)}
 
     def get_user_dashboard_stats(self, user_id: str) -> Dict[str, Any]:
         """Get dashboard statistics for a user"""

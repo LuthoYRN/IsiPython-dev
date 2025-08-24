@@ -2,6 +2,7 @@ from app import supabase
 from typing import Dict, Any
 from datetime import datetime
 from functools import lru_cache
+from app.utils.retry import retry_with_backoff  
 
 class QuizSubmission:
     def __init__(self):
@@ -201,6 +202,7 @@ class QuizSubmission:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    @retry_with_backoff(max_retries=5, base_delay=0.3)
     @lru_cache(maxsize=50)
     def get_batch_quiz_statistics_rpc(self, quiz_ids_str: str) -> Dict[str, Any]:
         """Get quiz statistics using Supabase RPC function"""
@@ -239,7 +241,13 @@ class QuizSubmission:
             
         except Exception as e:
             self.get_batch_quiz_statistics_rpc.cache_clear()
-            return {"success": False, "error": str(e)}
+            error_str = str(e).lower()
+            if ("resource temporarily unavailable" in error_str or 
+                "connection" in error_str or
+                "temporarily unavailable" in error_str):
+                raise  
+            else:
+                return {"success": False, "error": str(e)}
   
     def delete(self, submission_id: str, user_id: str = None) -> Dict[str, Any]:
         """Delete a submission (with optional user check for security)"""
