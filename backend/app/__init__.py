@@ -21,6 +21,7 @@ def create_app():
     from .routes.student_quizzes import student_quizzes
     from .routes.student_dashboard import student_dashboard
     from .routes.admin_dashboard import admin_dashboard
+    from .routes.cache_maintenance import cache_maintenance
     app.register_blueprint(main)
     app.register_blueprint(admin_challenges)
     app.register_blueprint(admin_quizzes)
@@ -28,5 +29,6 @@ def create_app():
     app.register_blueprint(student_quizzes)
     app.register_blueprint(student_dashboard)
     app.register_blueprint(admin_dashboard)
+    app.register_blueprint(cache_maintenance)
 
     return app
