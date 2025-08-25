@@ -47,6 +47,14 @@ KEYWORD MAPPINGS (Python → isiXhosa):
 - raise → phakamisa
 - in → ngaphakathi
 - is → ngu
+- nonlocal → ingaphandle
+- raise → phakamisa
+- continue → qhubeka
+- await → linda
+- assert → qinisekisa
+- async → ngemva
+- yield → velisa 
+- del → cima
 
 STRICT RULES:
 1. Use isiXhosa only, not isiZulu or any mixed dialect
@@ -223,6 +231,14 @@ KEYWORD MAPPINGS (Python → isiXhosa):
 - raise → phakamisa
 - in → ngaphakathi
 - is → ngu
+- nonlocal → ingaphandle
+- raise → phakamisa
+- continue → qhubeka
+- await → linda
+- assert → qinisekisa
+- async → ngemva
+- yield → velisa 
+- del → cima
 
 STRICT RULES:
 1. Use isiXhosa only, not isiZulu or any mixed dialect

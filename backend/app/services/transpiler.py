@@ -157,7 +157,7 @@ def _convert_input_calls(code: str, existing_mapping: dict, debug_mode: bool = F
             if challenge_mode:
                 print_line = f'{indent_str}print({quote_char}{prompt_text}{quote_char})'
             else:
-                print_line = f'{indent_str}print({quote_char}>>>{prompt_text}{quote_char})'
+                print_line = f'{indent_str}print({quote_char}>>>{prompt_text.rstrip("\\n")}{quote_char})'
             # Replace input("prompt") with input("") in the original line
             new_line = line.replace(f'input({quote_char}{prompt_text}{quote_char})', 'input("")')
             
