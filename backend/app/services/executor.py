@@ -135,7 +135,7 @@ def _check_execution_status(session: ExecutionSession) -> Dict[str, Any]:
     return_code = session.process.poll()
     if return_code is not None:
         # Process completed - collect all remaining output
-        return _finalize_session(session, return_code)
+        return _finalize_session(session)
     
     if _is_waiting_for_debug_step(session):
         debug_info = _parse_debug_output(session.output_lines)
