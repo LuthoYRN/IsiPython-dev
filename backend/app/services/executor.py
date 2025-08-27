@@ -3,7 +3,6 @@ import subprocess
 import os
 import ast
 import threading
-import queue
 import time
 from typing import Optional, Dict, Any
 
@@ -11,19 +10,15 @@ class ExecutionSession:
     def __init__(self, session_id: str):
         self.session_id = session_id
         self.process: Optional[subprocess.Popen] = None
-        self.input_queue = queue.Queue()
         self.current_prompt = ""
         self.output_lines = []
         self.error_lines = []
         self.is_waiting_for_input = False
         self.is_complete = False
-        self.start_time = time.time()
-        self.last_output_time = time.time()
         self.last_activity = time.time()  # Track last user interaction
         self.max_output_lines = 100  # Limit output buffer
         self.output_thread = None              
-        self.error_thread = None               
-        self.stop_monitoring = False   
+        self.error_thread = None        
         self.code = ""        
         self.line_mapping = {}  # Store line mapping for error translation
     
@@ -69,7 +64,6 @@ def _start_output_monitoring(session: ExecutionSession):
                         clean_line = clean_line[3:]
                         session.current_prompt = clean_line
                     session.add_output_line(clean_line)
-                    session.last_output_time = time.time()
                     print(f"[DEBUG] Captured stdout: '{clean_line}'")
                 else:
                     time.sleep(0.05)  # Short sleep if no line
@@ -84,7 +78,6 @@ def _start_output_monitoring(session: ExecutionSession):
                 if line:
                     clean_line = line.rstrip('\n')
                     session.error_lines.append(clean_line)
-                    session.last_output_time = time.time()
                     print(f"[DEBUG] Captured stderr: '{clean_line}'")
                 else:
                     time.sleep(0.05)
@@ -298,7 +291,7 @@ def _get_session_status(session_id: str) -> Dict[str, Any]:
     session = active_sessions[session_id]
     return _check_execution_status(session)
 
-def _finalize_session(session: ExecutionSession, return_code: int) -> Dict[str, Any]:
+def _finalize_session(session: ExecutionSession) -> Dict[str, Any]:
     """Finalize the session, collect all output and error, and mark as complete."""
     # Read any remaining output
     if session.process:

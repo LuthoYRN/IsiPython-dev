@@ -10,7 +10,7 @@ class Quiz:
         self.supabase = supabase  # Use the shared instance
 
     @staticmethod
-    def validate_data(data: Dict[str, Any], exclude_id: Optional[str] = None) -> Dict[str, str]:
+    def validate_data(data: Dict[str, Any]) -> Dict[str, str]:
         """Validate quiz data"""
         errors = {}
         
@@ -233,7 +233,7 @@ class Quiz:
         """Update quiz"""
         try:
             # Validate update data
-            validation_errors = self.validate_data(updates, exclude_id=quiz_id)
+            validation_errors = self.validate_data(updates)
             if validation_errors:
                 return {"success": False, "errors": validation_errors}
             
