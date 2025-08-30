@@ -128,7 +128,7 @@ def _execute_single_test(python_code: str, line_mapping: dict, test_case: dict) 
     """
     try:
         test_input_data = test_case["input_data"]
-        expected_output = test_case["expected_output"].strip()
+        expected_output = '\n'.join(line.rstrip() for line in test_case["expected_output"].strip().split('\n'))
         
         # Create input string for the program
         input_string = "\n".join(str(item) for item in test_input_data) + "\n"
