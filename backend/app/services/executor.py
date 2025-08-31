@@ -62,7 +62,7 @@ def _start_output_monitoring(session: ExecutionSession):
                     clean_line = line.rstrip('\n')
                     if line.startswith(">>>"): #for input prompts
                         clean_line = clean_line[3:]
-                        session.current_prompt = clean_line
+                        session.current_prompt = clean_line if clean_line else "empty_prompt"
                     session.add_output_line(clean_line)
                     print(f"[DEBUG] Captured stdout: '{clean_line}'")
                 else:
@@ -185,8 +185,8 @@ def _is_in_debug_mode(session: ExecutionSession) -> bool:
 def _is_waiting_for_input(session: ExecutionSession) -> bool:
     if not session.process or session.process.poll() is not None:
         return False
-    
-    if session.current_prompt and session.output_lines[-1]==session.current_prompt:
+    if (session.current_prompt=="empty_prompt"and not session.output_lines[-1]) or (session.current_prompt and session.output_lines[-1]==session.current_prompt):
+        session.current_prompt = "" if session.current_prompt=="empty_prompt" else session.current_prompt
         print(f"[DEBUG] Detected input prompt: {session.current_prompt}")
         return True
   

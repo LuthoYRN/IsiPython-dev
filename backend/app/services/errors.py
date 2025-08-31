@@ -342,7 +342,7 @@ STUDENT CODE:
         
     except Exception as e:
         # Fallback to simple timeout message
-        return "Ikhowudi yakho ithathe ixesha elide kakhulu (30 imizuzwana). Khangela imijikelwana(loops) engapheli okanye iindawo kwi khowudi yakho ezitya ixesha."
+        return "Ikhowudi yakho ithathe ixesha elide kakhulu (10 imizuzwana). Khangela imijikelwana(loops) engapheli okanye iindawo kwi khowudi yakho ezitya ixesha."
 
 def _convert_line_numbers(error_message: str, line_mapping: dict) -> str:
     """
