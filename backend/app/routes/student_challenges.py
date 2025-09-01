@@ -157,48 +157,7 @@ def get_challenge_details(challenge_id):
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@student_challenges.route('/api/challenges/<challenge_id>/progress', methods=['GET'])
-def get_user_progress(challenge_id):
-    """Get user's progress on a specific challenge"""
-    try:
-        user_id = request.args.get('user_id')
-        
-        if not user_id:
-            return jsonify({"error": "User ID is required"}), 400
-        
-        # Verify challenge exists
-        challenge_result = challenge_model.find_by_id(challenge_id)
-        if not challenge_result["success"]:
-            return jsonify({"error": "Challenge not found"}), 404
-        
-        # Get user's progress
-        progress_result = user_challenge_progress_model.get_user_progress(user_id, challenge_id)
-        if not progress_result["success"]:
-            return jsonify({"error": progress_result["error"]}), 500
-        
-        progress = progress_result["data"]
-        
-        # Get user's best submission details
-        best_submission = None
-        if progress.get("best_submission_id"):
-            best_result = challenge_submission_model.find_by_id(
-                progress["best_submission_id"], user_id
-            )
-            if best_result["success"]:
-                best_submission = best_result["data"]
-        
-        return jsonify({
-            "message": "User progress retrieved successfully",
-            "data": {
-                "progress": progress,
-                "best_submission": best_submission
-            }
-        }), 200
-        
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+    
 @student_challenges.route('/api/challenges/leaderboard', methods=['GET'])
 def get_leaderboard():
     """Get leaderboard for challenges"""
