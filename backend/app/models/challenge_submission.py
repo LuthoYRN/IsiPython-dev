@@ -187,6 +187,7 @@ class ChallengeSubmission:
                 # Return empty stats for all challenges
                 empty_stats = {
                     challenge_id: {
+                        "total_submissions": 0,
                         "users_attempted": 0,
                         "users_completed": 0,
                         "pass_rate": 0,
@@ -198,6 +199,7 @@ class ChallengeSubmission:
             stats_dict = {}
             for row in result.data:
                 stats_dict[row['challenge_id']] = {
+                    "total_submissions": int(row['total_submissions']),
                     "users_attempted": int(row['users_attempted']),
                     "users_completed": int(row['users_completed']),
                     "pass_rate": float(row['pass_rate']),

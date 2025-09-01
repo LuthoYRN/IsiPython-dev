@@ -261,35 +261,38 @@ def list_challenges():
             return jsonify({"error": result["error"]}), 500
         
         challenges = result["data"]
-        
+        import json
+        challenge_ids = [challenge['id'] for challenge in challenges]
+
+        batch_stats_result = challenge_submission_model.get_batch_challenge_statistics_rpc(
+            json.dumps(challenge_ids, sort_keys=True)  # Sorted for consistent caching
+        )
+        batch_stats = batch_stats_result.get("data", {}) if batch_stats_result.get("success") else {}
         # Enhance each challenge with submission statistics
         enhanced_challenges = []
         for challenge in challenges:
             challenge_data = {**challenge}
+            challenge_id = challenge['id']
             # Get submission statistics for this challenge
             if challenge['status']=="published":
-                stats_result = challenge_submission_model.get_challenge_statistics(challenge['id'])
-                
-                if stats_result["success"]:
-                    stats = stats_result["data"]
-                    challenge_data.update({
-                        "statistics":{
-                            "submissions_count": stats.get("total_submissions", 0),
-                            "users_attempted": stats.get("users_attempted", 0),
-                            "users_completed": stats.get("users_completed", 0),
-                            "pass_rate": stats.get("pass_rate", 0)
-                        }}
-                    )
-                else:
-                    # Fallback if statistics fail
-                    challenge_data.update({
-                        "statistics":{
-                            "submissions_count": 0,
-                            "users_attempted": 0,
-                            "users_completed": 0,
-                            "pass_rate": 0
-                        }}
-                    )
+                stats_result = batch_stats.get(challenge_id,{
+                "statistics":{
+                    "submissions_count":0,
+                    "users_attempted":0,
+                    "users_completed":0,
+                    "pass_rate":0
+                    }
+                }
+                )
+                challenge_data.update({
+                    "statistics":{
+                        "submissions_count": stats_result.get("total_submissions", 0),
+                        "users_attempted": stats_result.get("users_attempted", 0),
+                        "users_completed": stats_result.get("users_completed", 0),
+                        "pass_rate": stats_result.get("pass_rate", 0)
+                        }
+                    }
+                )
             
             enhanced_challenges.append(challenge_data)
         

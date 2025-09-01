@@ -224,6 +224,8 @@ class QuizSubmission:
                         "users_attempted": 0,
                         "users_passed": 0,
                         "pass_rate": 0,
+                        "average_score" : 0,
+                        "total_submissions": 0,
                     } for quiz_id in quiz_ids
                 }
                 return {"success": True, "data": empty_stats}
@@ -235,6 +237,8 @@ class QuizSubmission:
                     "users_attempted": int(row['users_attempted']),
                     "users_passed": int(row['users_passed']),
                     "pass_rate": float(row['pass_rate']),
+                    "average_score": float(row['average_score']),
+                    "total_submissions": int(row['total_submissions']),
                 }
             
             return {"success": True, "data": stats_dict}

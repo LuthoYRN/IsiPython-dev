@@ -197,6 +197,14 @@ def list_quizzes():
             return jsonify({"error": result["error"]}), 500
         
         quizzes = result["data"]
+
+        import json
+        quiz_ids = [quiz['id'] for quiz in quizzes]
+        batch_stats_result = quiz_submission_model.get_batch_quiz_statistics_rpc(
+            json.dumps(quiz_ids, sort_keys=True)  # Sorted for consistent caching
+        )
+        
+        batch_stats = batch_stats_result.get("data", {}) if batch_stats_result.get("success") else {}
         
         # Enhance each quiz with submission statistics 
         enhanced_quizzes = []
@@ -204,31 +212,26 @@ def list_quizzes():
             quiz_data = {**quiz}
             if quiz.get('status') == 'published':
                 # Get submission statistics for this quiz
-                stats_result = quiz_submission_model.get_quiz_statistics(quiz['id'])
+                quiz_id = quiz['id']
+                stats = batch_stats.get(quiz_id, {
+                    "statistics":{
+                        "attempts_count": 0,
+                        "users_attempted": 0,
+                        "users_passed": 0,
+                        "average_score":0,
+                        "pass_rate": 0,
+                    }
+                })
                 
-                if stats_result["success"]:
-                    stats = stats_result["data"]
-                    quiz_data.update({
-                        "statistics":{
-                            "attempts_count": stats.get("total_submissions", 0),
-                            "users_attempted": stats.get("users_attempted", 0),
-                            "users_passed": stats.get("users_passed", 0),
-                            "average_score": stats.get("average_score", 0),  
-                            "pass_rate": stats.get("pass_rate", 0)
-                        }
-
-                    })
-                else:
-                    # Fallback if statistics fail
-                    quiz_data.update({
-                        "statistics":{
-                            "attempts_count": 0,
-                            "users_attempted": 0,
-                            "users_passed": 0,
-                            "average_score": 0,
-                            "pass_rate": 0
-                        }
-                    })
+                quiz_data.update({
+                    "statistics":{
+                        "attempts_count": stats.get("total_submissions", 0),
+                        "users_attempted": stats.get("users_attempted", 0),
+                        "users_passed": stats.get("users_passed", 0),
+                        "average_score": stats.get("average_score", 0),  
+                        "pass_rate": stats.get("pass_rate", 0)
+                    }
+                })
             
             enhanced_quizzes.append(quiz_data)
         
