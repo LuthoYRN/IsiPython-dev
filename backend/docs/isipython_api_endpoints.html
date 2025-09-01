@@ -1981,75 +1981,1203 @@
                     }
             },
             ////////////////////////////////////////////////////////
-            '/api/admin/challenges': {
-                request: {
-                    method:"GET"
-                    
+            'GET /api/admin/challenges': {
+                request: {              
                 },
                 response: {
+                    "data": [
+                        {
+                            "created_at": "2025-08-10T20:39:19.12534+00:00",
+                            "difficulty_level": "Medium",
+                            "estimated_time": 45,
+                            "id": "60bfc347-6ac8-490b-89cd-8a4da67c1d91",
+                            "problem_statement": "Given a sorted array of integers nums and a target value, implement binary search to find the index of the target. If the target is not found, return -1.\n\nThe algorithm must run in O(log n) time complexity.\n\nConstraints:\n- 1 <= nums.length <= 10^4\n- -10^4 <= nums[i], target <= 10^4\n- All integers in nums are unique\n- nums is sorted in ascending order",
+                            "published_at": "2025-08-10T20:39:21.237994+00:00",
+                            "reward_points": 150,
+                            "search_vector": "'algorithm':8 'array':17 'binari':1,6 'find':10 'implement':3,4 'search':2,7 'sort':16 'target':12 'valu':13",
+                            "send_notifications": true,
+                            "short_description": "Implement the binary search algorithm to find a target value in a sorted array",
+                            "slug": "binary-search-implementation",
+                            "statistics": {
+                                "pass_rate": 0.0,
+                                "submissions_count": 4,
+                                "users_attempted": 1,
+                                "users_completed": 0
+                            },
+                            "status": "published",
+                            "tags": [
+                                "algorithms",
+                                "binary-search",
+                                "divide-and-conquer"
+                            ],
+                            "title": "Binary Search Implementation",
+                            "updated_at": "2025-08-10T20:39:21.237994+00:00"
+                        },
+                        {
+                            "created_at": "2025-08-15T23:57:26.993232+00:00",
+                            "difficulty_level": "Easy",
+                            "estimated_time": 30,
+                            "id": "c6c6a9ab-cecb-4dce-9ee4-a04c8dcb6773",
+                            "problem_statement": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
+                            "published_at": "2025-08-16T00:15:26.120684+00:00",
+                            "reward_points": 99,
+                            "search_vector": "'add':11 'array':9 'find':4 'number':6 'problem':3 'sum':2 'target':15 'two':1,5 'valu':16",
+                            "send_notifications": false,
+                            "short_description": "Find two numbers in an array that add up to a target value",
+                            "slug": "two-sum-problem",
+                            "statistics": {
+                                "pass_rate": 0.0,
+                                "submissions_count": 4,
+                                "users_attempted": 1,
+                                "users_completed": 0
+                            },
+                            "status": "published",
+                            "tags": [
+                                "algorithms",
+                                "arrays",
+                                "hash-table"
+                            ],
+                            "title": "Two Sum Problem",
+                            "updated_at": "2025-08-16T00:15:26.120684+00:00"
+                        },
+                        {
+                            "created_at": "2025-08-17T23:23:20.651337+00:00",
+                            "difficulty_level": "Easy",
+                            "estimated_time": 15,
+                            "id": "7162fc36-862a-47a2-9e7c-6a5fc3e9dc82",
+                            "problem_statement": "Write a program that:\n1. Asks the user to enter the first number\n2. Asks the user to enter the second number\n3. Calculates and prints the sum of the two numbers\n\nExample:\nEnter first number: 5\nEnter second number: 3\nThe sum is: 8",
+                            "published_at": "2025-08-17T23:23:22.569244+00:00",
+                            "reward_points": 30,
+                            "search_vector": "'add':8 'basic':5 'calcul':2,6 'creat':3 'number':10 'simpl':1 'two':9",
+                            "send_notifications": false,
+                            "short_description": "Create a basic calculator that adds two numbers",
+                            "slug": "simple-calculator",
+                            "statistics": {
+                                "pass_rate": 100.0,
+                                "submissions_count": 44,
+                                "users_attempted": 6,
+                                "users_completed": 6
+                            },
+                            "status": "published",
+                            "tags": [
+                                "input",
+                                "output",
+                                "arithmetic"
+                            ],
+                            "title": "Simple Calculator",
+                            "updated_at": "2025-08-17T23:23:22.569244+00:00"
+                        }
+                    ],
+                    "filters_applied": {
+                        "limit": 20,
+                        "offset": 0,
+                        "order_by": "created_at",
+                        "order_direction": "asc"
+                    },
+                    "message": "Challenges retrieved successfully",
+                    "total_count": 3
                 }
             },
-            '/api/admin/challenges': {
+            'POST /api/admin/challenges': {
                 request: {
-                    method:"POST",
-                    body:{
+                    scenarios:[
+                        {
+                            title:"Create as draft",
+                            data:{
+                                "title": "Two Sum Problem",
+                                "short_description": "Find two numbers in an array that add up to a target value",
+                                "problem_statement": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
+                                "difficulty_level": "Easy",
+                                "reward_points": 100,
+                                "estimated_time": 30,
+                                "tags": ["algorithms", "arrays", "hash-table"],
+                                "send_notifications": false,
+                                "test_cases": [
+                                    {
+                                    "input_data": ["[2,7,11,15]", "9"],
+                                    "expected_output": "[0,1]",
+                                    "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]",
+                                    "is_hidden": false,
+                                    "is_example": true,
+                                    "points_weight": 25.0
+                                    },
+                                    {
+                                    "input_data": ["[3,2,4]", "6"],
+                                    "expected_output": "[1,2]",
+                                    "explanation": "Because nums[1] + nums[2] == 6, we return [1, 2]",
+                                    "is_hidden": false,
+                                    "is_example": false,
+                                    "points_weight": 25.0
+                                    },
+                                    {
+                                    "input_data": ["[3,3]", "6"],
+                                    "expected_output": "[0,1]",
+                                    "explanation": "Handle duplicate values correctly",
+                                    "is_hidden": true,
+                                    "is_example": false,
+                                    "points_weight": 25.0
+                                    },
+                                    {
+                                    "input_data": ["[]", "5"],
+                                    "expected_output": "[]",
+                                    "explanation": "Empty array edge case",
+                                    "is_hidden": true,
+                                    "is_example": false,
+                                    "points_weight": 25.0
+                                    }
+                                ],
+                                "action": "save_draft"
+                            }
+                        },
+                        {
+                            title:"Create and publish",
+                            data:{
+                                "title": "Two Sum Problem",
+                                "short_description": "Find two numbers in an array that add up to a target value",
+                                "problem_statement": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
+                                "difficulty_level": "Easy",
+                                "reward_points": 100,
+                                "estimated_time": 30,
+                                "tags": ["algorithms", "arrays", "hash-table"],
+                                "send_notifications": false,
+                                "test_cases": [
+                                    {
+                                    "input_data": ["[2,7,11,15]", "9"],
+                                    "expected_output": "[0,1]",
+                                    "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]",
+                                    "is_hidden": false,
+                                    "is_example": true,
+                                    "points_weight": 25.0
+                                    },
+                                    {
+                                    "input_data": ["[3,2,4]", "6"],
+                                    "expected_output": "[1,2]",
+                                    "explanation": "Because nums[1] + nums[2] == 6, we return [1, 2]",
+                                    "is_hidden": false,
+                                    "is_example": false,
+                                    "points_weight": 25.0
+                                    },
+                                    {
+                                    "input_data": ["[3,3]", "6"],
+                                    "expected_output": "[0,1]",
+                                    "explanation": "Handle duplicate values correctly",
+                                    "is_hidden": true,
+                                    "is_example": false,
+                                    "points_weight": 25.0
+                                    },
+                                    {
+                                    "input_data": ["[]", "5"],
+                                    "expected_output": "[]",
+                                    "explanation": "Empty array edge case",
+                                    "is_hidden": true,
+                                    "is_example": false,
+                                    "points_weight": 25.0
+                                    }
+                                ],
+                                "action": "publish"
+                            }
 
-                    }
-                    
+                        }
+                        ,
+                        {
+                            title:"Update",
+                            data:{
+                                "id":"c6c6a9ab-cecb-4dce-9ee4-a04c8dcb6773",
+                                "title": "Two Sum Problem",
+                                "short_description": "Find two numbers in an array that add up to a target value",
+                                "problem_statement": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
+                                "difficulty_level": "Easy",
+                                "reward_points": 100,
+                                "estimated_time": 30,
+                                "tags": ["algorithms", "arrays", "hash-table"],
+                                "send_notifications": false,
+                                "test_cases": [
+                                    {
+                                    "input_data": ["[2,7,11,15]", "9"],
+                                    "expected_output": "[0,1]",
+                                    "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]",
+                                    "is_hidden": false,
+                                    "is_example": true,
+                                    "points_weight": 25.0
+                                    },
+                                    {
+                                    "input_data": ["[3,2,4]", "6"],
+                                    "expected_output": "[1,2]",
+                                    "explanation": "Because nums[1] + nums[2] == 6, we return [1, 2]",
+                                    "is_hidden": false,
+                                    "is_example": false,
+                                    "points_weight": 25.0
+                                    },
+                                    {
+                                    "input_data": ["[3,3]", "6"],
+                                    "expected_output": "[0,1]",
+                                    "explanation": "Handle duplicate values correctly",
+                                    "is_hidden": true,
+                                    "is_example": false,
+                                    "points_weight": 25.0
+                                    },
+                                    {
+                                    "input_data": ["[]", "5"],
+                                    "expected_output": "[]",
+                                    "explanation": "Empty array edge case",
+                                    "is_hidden": true,
+                                    "is_example": false,
+                                    "points_weight": 25.0
+                                    }
+                                ],
+                                "action": "save_draft"
+                            }
+                        }
+                    ]
                 },
                 response: {
+                    scenarios:[
+                        {
+                            title:"Create as draft",
+                            data:{
+                                "data": {
+                                    "created_at": "2025-09-01T03:18:35.009344+00:00",
+                                    "difficulty_level": "Easy",
+                                    "estimated_time": 30,
+                                    "id": "9c6f90b7-2f8a-41f9-9e07-704ed62d0c4a",
+                                    "problem_statement": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
+                                    "published_at": null,
+                                    "reward_points": 100,
+                                    "search_vector": "'add':11 'array':9 'find':4 'number':6 'problemv2':3 'sum':2 'target':15 'two':1,5 'valu':16",
+                                    "send_notifications": false,
+                                    "short_description": "Find two numbers in an array that add up to a target value",
+                                    "slug": "two-sum-problem",
+                                    "status": "draft",
+                                    "tags": [
+                                        "algorithms",
+                                        "arrays",
+                                        "hash-table"
+                                    ],
+                                    "test_cases": [
+                                        {
+                                            "challenge_id": "9c6f90b7-2f8a-41f9-9e07-704ed62d0c4a",
+                                            "created_at": "2025-09-01T03:18:35.500509+00:00",
+                                            "expected_output": "[0,1]",
+                                            "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]",
+                                            "id": "2d6922af-af69-46cd-adac-30d75194bdd0",
+                                            "input_data": [
+                                                "[2,7,11,15]",
+                                                "9"
+                                            ],
+                                            "is_example": true,
+                                            "is_hidden": false,
+                                            "points_weight": 25.0
+                                        },
+                                        {
+                                            "challenge_id": "9c6f90b7-2f8a-41f9-9e07-704ed62d0c4a",
+                                            "created_at": "2025-09-01T03:18:35.943236+00:00",
+                                            "expected_output": "[1,2]",
+                                            "explanation": "Because nums[1] + nums[2] == 6, we return [1, 2]",
+                                            "id": "d1816cf3-af2a-4d9b-909d-8ac874844e2a",
+                                            "input_data": [
+                                                "[3,2,4]",
+                                                "6"
+                                            ],
+                                            "is_example": false,
+                                            "is_hidden": false,
+                                            "points_weight": 25.0
+                                        },
+                                        {
+                                            "challenge_id": "9c6f90b7-2f8a-41f9-9e07-704ed62d0c4a",
+                                            "created_at": "2025-09-01T03:18:36.388906+00:00",
+                                            "expected_output": "[0,1]",
+                                            "explanation": "Handle duplicate values correctly",
+                                            "id": "f0345ec3-253a-48e7-adc6-6eb1452539d5",
+                                            "input_data": [
+                                                "[3,3]",
+                                                "6"
+                                            ],
+                                            "is_example": false,
+                                            "is_hidden": true,
+                                            "points_weight": 25.0
+                                        },
+                                        {
+                                            "challenge_id": "9c6f90b7-2f8a-41f9-9e07-704ed62d0c4a",
+                                            "created_at": "2025-09-01T03:18:36.80113+00:00",
+                                            "expected_output": "[]",
+                                            "explanation": "Empty array edge case",
+                                            "id": "0c35b0c0-6b96-43f6-94c5-47824893bb5d",
+                                            "input_data": [
+                                                "[]",
+                                                "5"
+                                            ],
+                                            "is_example": false,
+                                            "is_hidden": true,
+                                            "points_weight": 25.0
+                                        }
+                                    ],
+                                    "title": "Two Sum Problem",
+                                    "updated_at": "2025-09-01T03:18:35.009344+00:00"
+                                },
+                                "message": "Challenge saved successfully"
+                            }
+                        },
+                        {
+                            title:"Create and publish",
+                            data:{
+                                "data": {
+                                    "created_at": "2025-09-01T03:23:10.615459+00:00",
+                                    "difficulty_level": "Easy",
+                                    "estimated_time": 30,
+                                    "id": "c3fd5c98-e874-4235-883e-ed83aeff1490",
+                                    "problem_statement": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
+                                    "published_at": "2025-09-01T03:23:12.887658+00:00",
+                                    "reward_points": 100,
+                                    "search_vector": "'add':11 'array':9 'find':4 'number':6 'problemv3':3 'sum':2 'target':15 'two':1,5 'valu':16",
+                                    "send_notifications": false,
+                                    "short_description": "Find two numbers in an array that add up to a target value",
+                                    "slug": "two-sum-problem",
+                                    "status": "published",
+                                    "tags": [
+                                        "algorithms",
+                                        "arrays",
+                                        "hash-table"
+                                    ],
+                                    "test_cases": [
+                                        {
+                                            "challenge_id": "c3fd5c98-e874-4235-883e-ed83aeff1490",
+                                            "created_at": "2025-09-01T03:23:11.0481+00:00",
+                                            "expected_output": "[0,1]",
+                                            "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]",
+                                            "id": "2bb89dfb-8cc3-4354-8c28-d006eb3c150a",
+                                            "input_data": [
+                                                "[2,7,11,15]",
+                                                "9"
+                                            ],
+                                            "is_example": true,
+                                            "is_hidden": false,
+                                            "points_weight": 25.0
+                                        },
+                                        {
+                                            "challenge_id": "c3fd5c98-e874-4235-883e-ed83aeff1490",
+                                            "created_at": "2025-09-01T03:23:11.454674+00:00",
+                                            "expected_output": "[1,2]",
+                                            "explanation": "Because nums[1] + nums[2] == 6, we return [1, 2]",
+                                            "id": "181f9531-f0e0-4c51-9bf3-06c4d77b812c",
+                                            "input_data": [
+                                                "[3,2,4]",
+                                                "6"
+                                            ],
+                                            "is_example": false,
+                                            "is_hidden": false,
+                                            "points_weight": 25.0
+                                        },
+                                        {
+                                            "challenge_id": "c3fd5c98-e874-4235-883e-ed83aeff1490",
+                                            "created_at": "2025-09-01T03:23:11.854982+00:00",
+                                            "expected_output": "[0,1]",
+                                            "explanation": "Handle duplicate values correctly",
+                                            "id": "1e1e1236-c4b3-48b6-90f9-01caa8dba2cd",
+                                            "input_data": [
+                                                "[3,3]",
+                                                "6"
+                                            ],
+                                            "is_example": false,
+                                            "is_hidden": true,
+                                            "points_weight": 25.0
+                                        },
+                                        {
+                                            "challenge_id": "c3fd5c98-e874-4235-883e-ed83aeff1490",
+                                            "created_at": "2025-09-01T03:23:12.262513+00:00",
+                                            "expected_output": "[]",
+                                            "explanation": "Empty array edge case",
+                                            "id": "a69b92f2-b3b0-4960-84c6-f7ceba75b505",
+                                            "input_data": [
+                                                "[]",
+                                                "5"
+                                            ],
+                                            "is_example": false,
+                                            "is_hidden": true,
+                                            "points_weight": 25.0
+                                        }
+                                    ],
+                                    "title": "Two Sum Problem",
+                                    "updated_at": "2025-09-01T03:23:12.887658+00:00"
+                                },
+                                "message": "Challenge published successfully"
+                            }
+
+                        }
+                        ,
+                        {
+                            title:"Update",
+                            data:{
+                                "data": {
+                                    "created_at": "2025-09-01T03:18:35.009344+00:00",
+                                    "difficulty_level": "Easy",
+                                    "estimated_time": 30,
+                                    "id": "9c6f90b7-2f8a-41f9-9e07-704ed62d0c4a",
+                                    "problem_statement": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
+                                    "published_at": null,
+                                    "reward_points": 100,
+                                    "search_vector": "'add':11 'array':9 'find':4 'number':6 'problemv2':3 'sum':2 'target':15 'two':1,5 'valu':16",
+                                    "send_notifications": false,
+                                    "short_description": "Find two numbers in an array that add up to a target value",
+                                    "slug": "two-sum-problem",
+                                    "status": "draft",
+                                    "tags": [
+                                        "algorithms",
+                                        "arrays",
+                                        "hash-table"
+                                    ],
+                                    "test_cases": [
+                                        {
+                                            "challenge_id": "9c6f90b7-2f8a-41f9-9e07-704ed62d0c4a",
+                                            "created_at": "2025-09-01T03:18:35.500509+00:00",
+                                            "expected_output": "[0,1]",
+                                            "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]",
+                                            "id": "2d6922af-af69-46cd-adac-30d75194bdd0",
+                                            "input_data": [
+                                                "[2,7,11,15]",
+                                                "9"
+                                            ],
+                                            "is_example": true,
+                                            "is_hidden": false,
+                                            "points_weight": 25.0
+                                        },
+                                        {
+                                            "challenge_id": "9c6f90b7-2f8a-41f9-9e07-704ed62d0c4a",
+                                            "created_at": "2025-09-01T03:18:35.943236+00:00",
+                                            "expected_output": "[1,2]",
+                                            "explanation": "Because nums[1] + nums[2] == 6, we return [1, 2]",
+                                            "id": "d1816cf3-af2a-4d9b-909d-8ac874844e2a",
+                                            "input_data": [
+                                                "[3,2,4]",
+                                                "6"
+                                            ],
+                                            "is_example": false,
+                                            "is_hidden": false,
+                                            "points_weight": 25.0
+                                        },
+                                        {
+                                            "challenge_id": "9c6f90b7-2f8a-41f9-9e07-704ed62d0c4a",
+                                            "created_at": "2025-09-01T03:18:36.388906+00:00",
+                                            "expected_output": "[0,1]",
+                                            "explanation": "Handle duplicate values correctly",
+                                            "id": "f0345ec3-253a-48e7-adc6-6eb1452539d5",
+                                            "input_data": [
+                                                "[3,3]",
+                                                "6"
+                                            ],
+                                            "is_example": false,
+                                            "is_hidden": true,
+                                            "points_weight": 25.0
+                                        },
+                                        {
+                                            "challenge_id": "9c6f90b7-2f8a-41f9-9e07-704ed62d0c4a",
+                                            "created_at": "2025-09-01T03:18:36.80113+00:00",
+                                            "expected_output": "[]",
+                                            "explanation": "Empty array edge case",
+                                            "id": "0c35b0c0-6b96-43f6-94c5-47824893bb5d",
+                                            "input_data": [
+                                                "[]",
+                                                "5"
+                                            ],
+                                            "is_example": false,
+                                            "is_hidden": true,
+                                            "points_weight": 25.0
+                                        }
+                                    ],
+                                    "title": "Two Sum Problem",
+                                    "updated_at": "2025-09-01T03:18:35.009344+00:00"
+                                },
+                                "message": "Challenge saved successfully"
+                            }
+                        }
+                    ]
+
                 }
             },
-            '/api/admin/challenges/<challenge_id>': {
+            'DELETE /api/admin/challenges/<challenge_id>': {
                 request: {
-                    method:"DELETE"
-                    
                 },
                 response: {
+                    "message": "Challenge deleted successfully"
                 }
             },
-            '/api/admin/challenges/<challenge_id>': {
+            'GET /api/admin/challenges/<challenge_id>': {
                 request: {
-                    method:"GET"
                     
                 },
                 response: {
+                    "data": {
+                        "created_at": "2025-08-10T20:39:19.12534+00:00",
+                        "difficulty_level": "Medium",
+                        "estimated_time": 45,
+                        "id": "60bfc347-6ac8-490b-89cd-8a4da67c1d91",
+                        "problem_statement": "Given a sorted array of integers nums and a target value, implement binary search to find the index of the target. If the target is not found, return -1.\n\nThe algorithm must run in O(log n) time complexity.\n\nConstraints:\n- 1 <= nums.length <= 10^4\n- -10^4 <= nums[i], target <= 10^4\n- All integers in nums are unique\n- nums is sorted in ascending order",
+                        "published_at": "2025-08-10T20:39:21.237994+00:00",
+                        "reward_points": 150,
+                        "search_vector": "'algorithm':8 'array':17 'binari':1,6 'find':10 'implement':3,4 'search':2,7 'sort':16 'target':12 'valu':13",
+                        "send_notifications": true,
+                        "short_description": "Implement the binary search algorithm to find a target value in a sorted array",
+                        "slug": "binary-search-implementation",
+                        "status": "published",
+                        "tags": [
+                            "algorithms",
+                            "binary-search",
+                            "divide-and-conquer"
+                        ],
+                        "test_cases": [
+                            {
+                                "challenge_id": "60bfc347-6ac8-490b-89cd-8a4da67c1d91",
+                                "created_at": "2025-08-10T20:39:19.571632+00:00",
+                                "expected_output": "3",
+                                "explanation": "Target 7 is at index 3",
+                                "id": "26cb15dd-51f2-4a0d-88f1-cbe96b78ec8a",
+                                "input_data": [
+                                    "[1,3,5,7,9,11]",
+                                    "7"
+                                ],
+                                "is_example": true,
+                                "is_hidden": false,
+                                "points_weight": 30.0
+                            },
+                            {
+                                "challenge_id": "60bfc347-6ac8-490b-89cd-8a4da67c1d91",
+                                "created_at": "2025-08-10T20:39:19.990343+00:00",
+                                "expected_output": "-1",
+                                "explanation": "Target 2 is not in the array",
+                                "id": "8a0f302f-e287-42d8-bdf7-466b5ceb295d",
+                                "input_data": [
+                                    "[1,3,5,7,9,11]",
+                                    "2"
+                                ],
+                                "is_example": false,
+                                "is_hidden": false,
+                                "points_weight": 30.0
+                            },
+                            {
+                                "challenge_id": "60bfc347-6ac8-490b-89cd-8a4da67c1d91",
+                                "created_at": "2025-08-10T20:39:20.397838+00:00",
+                                "expected_output": "0",
+                                "explanation": "Single element array",
+                                "id": "4b42eebc-7180-4d28-b02d-ce8058a5360c",
+                                "input_data": [
+                                    "[5]",
+                                    "5"
+                                ],
+                                "is_example": false,
+                                "is_hidden": true,
+                                "points_weight": 40.0
+                            },
+                            {
+                                "challenge_id": "60bfc347-6ac8-490b-89cd-8a4da67c1d91",
+                                "created_at": "2025-08-10T20:39:20.823655+00:00",
+                                "expected_output": "-1",
+                                "explanation": "Empty array",
+                                "id": "bc57cd8a-4f6f-4d6d-885f-cb3ec86b0210",
+                                "input_data": [
+                                    "[]",
+                                    "1"
+                                ],
+                                "is_example": false,
+                                "is_hidden": true,
+                                "points_weight": 50.0
+                            }
+                        ],
+                        "title": "Binary Search Implementation",
+                        "updated_at": "2025-08-10T20:39:21.237994+00:00"
+                    },
+                    "message": "Challenge details retrieved successfully"
+
                 }
             },
               ////////////////////////////////////////////////////////
-            '/api/admin/quizzes': {
+            'POST /api/admin/quizzes': {
                 request: {
-                    method:"GET"
+                    scenarios:[
+                        {
+                            title:"Create as draft",
+                            data:{
+                                "title": "Python Fundamentals Quiz",
+                                "description": "Test your knowledge of Python basics",
+                                "due_date": "2025-09-15T23:59:59Z",
+                                "time_limit_minutes": 45,
+                                "send_notifications": true,
+                                "randomize_question_order": true,
+                                "show_results_immediately": false,
+                                "allow_multiple_attempts": true,
+                                "questions": [
+                                    {
+                                        "question_order_idx": 1,
+                                        "question_text": "What is the correct way to declare a variable in Python?",
+                                        "option_a": "var x = 5",
+                                        "option_b": "int x = 5",
+                                        "option_c": "x = 5",
+                                        "option_d": "declare x = 5",
+                                        "correct_answer": "C",
+                                        "explanation": "Python uses dynamic typing",
+                                        "points_weight": 10
+                                    },
+                                    {
+                                        "question_order_idx": 2,
+                                        "question_text": "Which operator is used for exponentiation?",
+                                        "option_a": "^",
+                                        "option_b": "**",
+                                        "option_c": "pow",
+                                        "option_d": "exp",
+                                        "correct_answer": "B",
+                                        "explanation": "** is the exponentiation operator",
+                                        "points_weight": 10
+                                    },
+                                    {
+                                        "question_order_idx": 3,
+                                        "question_text": "What data type is 3.14?",
+                                        "option_a": "int",
+                                        "option_b": "float",
+                                        "option_c": "double",
+                                        "option_d": "decimal",
+                                        "correct_answer": "B",
+                                        "explanation": "3.14 is a floating-point number",
+                                        "points_weight": 10
+                                    }
+                                ],
+                                "action": "save_draft"
+                            }
+                        },
+                        {
+                            title:"Create and publish",
+                            data:{
+                                "title": "Python Fundamentals Quiz",
+                                "description": "Test your knowledge of Python basics",
+                                "due_date": "2025-09-15T23:59:59Z",
+                                "time_limit_minutes": 45,
+                                "send_notifications": true,
+                                "randomize_question_order": true,
+                                "show_results_immediately": false,
+                                "allow_multiple_attempts": true,
+                                "questions": [
+                                    {
+                                        "question_order_idx": 1,
+                                        "question_text": "What is the correct way to declare a variable in Python?",
+                                        "option_a": "var x = 5",
+                                        "option_b": "int x = 5",
+                                        "option_c": "x = 5",
+                                        "option_d": "declare x = 5",
+                                        "correct_answer": "C",
+                                        "explanation": "Python uses dynamic typing",
+                                        "points_weight": 10
+                                    },
+                                    {
+                                        "question_order_idx": 2,
+                                        "question_text": "Which operator is used for exponentiation?",
+                                        "option_a": "^",
+                                        "option_b": "**",
+                                        "option_c": "pow",
+                                        "option_d": "exp",
+                                        "correct_answer": "B",
+                                        "explanation": "** is the exponentiation operator",
+                                        "points_weight": 10
+                                    },
+                                    {
+                                        "question_order_idx": 3,
+                                        "question_text": "What data type is 3.14?",
+                                        "option_a": "int",
+                                        "option_b": "float",
+                                        "option_c": "double",
+                                        "option_d": "decimal",
+                                        "correct_answer": "B",
+                                        "explanation": "3.14 is a floating-point number",
+                                        "points_weight": 10
+                                    }
+                                ],
+                                "action": "publish"
+                            }
+                        }
+                        ,
+                        {
+                            title:"Update",
+                            data:{
+                                "id": "8ff2cdba-fdcc-4ab0-bc95-71db236a4d8c",
+                                "title": "Python Fundamentals Quiz",
+                                "description": "Test your knowledge of Python basics",
+                                "due_date": "2025-09-15T23:59:59Z",
+                                "time_limit_minutes": 45,
+                                "send_notifications": true,
+                                "randomize_question_order": true,
+                                "show_results_immediately": false,
+                                "allow_multiple_attempts": true,
+                                "questions": [
+                                    {
+                                        "question_order_idx": 1,
+                                        "question_text": "What is the correct way to declare a variable in Python?",
+                                        "option_a": "var x = 5",
+                                        "option_b": "int x = 5",
+                                        "option_c": "x = 5",
+                                        "option_d": "declare x = 5",
+                                        "correct_answer": "C",
+                                        "explanation": "Python uses dynamic typing",
+                                        "points_weight": 10
+                                    },
+                                    {
+                                        "question_order_idx": 2,
+                                        "question_text": "Which operator is used for exponentiation?",
+                                        "option_a": "^",
+                                        "option_b": "**",
+                                        "option_c": "pow",
+                                        "option_d": "exp",
+                                        "correct_answer": "B",
+                                        "explanation": "** is the exponentiation operator",
+                                        "points_weight": 10
+                                    },
+                                    {
+                                        "question_order_idx": 3,
+                                        "question_text": "What data type is 3.14?",
+                                        "option_a": "int",
+                                        "option_b": "float",
+                                        "option_c": "double",
+                                        "option_d": "decimal",
+                                        "correct_answer": "B",
+                                        "explanation": "3.14 is a floating-point number",
+                                        "points_weight": 10
+                                    }
+                                ],
+                                "action": "save_draft"
+                            }
+                        }
+                    ]
                     
                 },
                 response: {
-                }
-            },
-            '/api/admin/quizzes': {
-                request: {
-                    method:"POST",
-                    body:{
+                    scenarios:[
+                        {
+                            title:"Create as draft",
+                            data:{
+                                "data": {
+                                    "allow_multiple_attempts": true,
+                                    "created_at": "2025-09-01T03:28:49.650489+00:00",
+                                    "description": "Test your knowledge of Python basics",
+                                    "due_date": "2025-09-15T23:59:59+00:00",
+                                    "id": "8ff2cdba-fdcc-4ab0-bc95-71db236a4d8c",
+                                    "instructions": [],
+                                    "published_at": null,
+                                    "questions": [
+                                        {
+                                            "correct_answer": "C",
+                                            "created_at": "2025-09-01T03:28:50.285175+00:00",
+                                            "explanation": "Python uses dynamic typing",
+                                            "id": "d58c53e1-62e4-4f35-b3b1-03ded09ffff1",
+                                            "option_a": "var x = 5",
+                                            "option_b": "int x = 5",
+                                            "option_c": "x = 5",
+                                            "option_d": "declare x = 5",
+                                            "points_weight": 10.0,
+                                            "question_order_idx": "1",
+                                            "question_text": "What is the correct way to declare a variable in Python?",
+                                            "quiz_id": "8ff2cdba-fdcc-4ab0-bc95-71db236a4d8c"
+                                        },
+                                        {
+                                            "correct_answer": "B",
+                                            "created_at": "2025-09-01T03:28:50.285175+00:00",
+                                            "explanation": "** is the exponentiation operator",
+                                            "id": "57813907-52cf-4f62-b08f-91b58923e331",
+                                            "option_a": "^",
+                                            "option_b": "**",
+                                            "option_c": "pow",
+                                            "option_d": "exp",
+                                            "points_weight": 10.0,
+                                            "question_order_idx": "2",
+                                            "question_text": "Which operator is used for exponentiation?",
+                                            "quiz_id": "8ff2cdba-fdcc-4ab0-bc95-71db236a4d8c"
+                                        },
+                                        {
+                                            "correct_answer": "B",
+                                            "created_at": "2025-09-01T03:28:50.285175+00:00",
+                                            "explanation": "3.14 is a floating-point number",
+                                            "id": "c14daade-e95f-44f3-a009-103d8318088f",
+                                            "option_a": "int",
+                                            "option_b": "float",
+                                            "option_c": "double",
+                                            "option_d": "decimal",
+                                            "points_weight": 10.0,
+                                            "question_order_idx": "3",
+                                            "question_text": "What data type is 3.14?",
+                                            "quiz_id": "8ff2cdba-fdcc-4ab0-bc95-71db236a4d8c"
+                                        }
+                                    ],
+                                    "randomize_question_order": true,
+                                    "search_vector": "'basic':9 'fundament':2 'knowledg':6 'python':1,8 'quiz':3 'test':4",
+                                    "send_notifications": true,
+                                    "show_results_immediately": false,
+                                    "slug": "python-fundamentals-quiz",
+                                    "status": "draft",
+                                    "time_limit_minutes": 45,
+                                    "title": "Python Fundamentals Quiz",
+                                    "total_points": 30,
+                                    "total_questions": 3,
+                                    "updated_at": "2025-09-01T03:28:50.710551+00:00"
+                                },
+                                "message": "Quiz saved successfully"
+                            }
+                        },
+                        {
+                            title:"Create and publish",
+                            data:{
+                                "data": {
+                                    "allow_multiple_attempts": true,
+                                    "created_at": "2025-09-01T03:33:08.608639+00:00",
+                                    "description": "Test your knowledge of Python basics",
+                                    "due_date": "2025-09-15T23:59:59+00:00",
+                                    "id": "4ed950ff-fec9-4ced-878d-9aea783a90ee",
+                                    "instructions": [],
+                                    "published_at": "2025-09-01T03:33:10.41733+00:00",
+                                    "questions": [
+                                        {
+                                            "correct_answer": "C",
+                                            "created_at": "2025-09-01T03:33:09.415845+00:00",
+                                            "explanation": "Python uses dynamic typing",
+                                            "id": "6f07aafc-4dd1-4a21-84b2-10d33d55a4db",
+                                            "option_a": "var x = 5",
+                                            "option_b": "int x = 5",
+                                            "option_c": "x = 5",
+                                            "option_d": "declare x = 5",
+                                            "points_weight": 10.0,
+                                            "question_order_idx": "1",
+                                            "question_text": "What is the correct way to declare a variable in Python?",
+                                            "quiz_id": "4ed950ff-fec9-4ced-878d-9aea783a90ee"
+                                        },
+                                        {
+                                            "correct_answer": "B",
+                                            "created_at": "2025-09-01T03:33:09.415845+00:00",
+                                            "explanation": "** is the exponentiation operator",
+                                            "id": "ceb90e8e-a434-43f9-a94c-fd26febd326e",
+                                            "option_a": "^",
+                                            "option_b": "**",
+                                            "option_c": "pow",
+                                            "option_d": "exp",
+                                            "points_weight": 10.0,
+                                            "question_order_idx": "2",
+                                            "question_text": "Which operator is used for exponentiation?",
+                                            "quiz_id": "4ed950ff-fec9-4ced-878d-9aea783a90ee"
+                                        },
+                                        {
+                                            "correct_answer": "B",
+                                            "created_at": "2025-09-01T03:33:09.415845+00:00",
+                                            "explanation": "3.14 is a floating-point number",
+                                            "id": "1899ab55-cde9-4a3d-8a6e-1104cf1b2b54",
+                                            "option_a": "int",
+                                            "option_b": "float",
+                                            "option_c": "double",
+                                            "option_d": "decimal",
+                                            "points_weight": 10.0,
+                                            "question_order_idx": "3",
+                                            "question_text": "What data type is 3.14?",
+                                            "quiz_id": "4ed950ff-fec9-4ced-878d-9aea783a90ee"
+                                        }
+                                    ],
+                                    "randomize_question_order": true,
+                                    "search_vector": "'basic':9 'fundament':2 'knowledg':6 'python':1,8 'quizv2':3 'test':4",
+                                    "send_notifications": true,
+                                    "show_results_immediately": false,
+                                    "slug": "python-fundamentals-quiz",
+                                    "status": "published",
+                                    "time_limit_minutes": 45,
+                                    "title": "Python Fundamentals Quiz",
+                                    "total_points": 30,
+                                    "total_questions": 3,
+                                    "updated_at": "2025-09-01T03:33:10.41733+00:00"
+                                },
+                                "message": "Quiz published successfully"
+                            }
 
-                    }
-                    
-                },
-                response: {
+                        }
+                        ,
+                        {
+                            title:"Update",
+                            data:{
+                                "data": {
+                                    "allow_multiple_attempts": true,
+                                    "created_at": "2025-09-01T03:28:49.650489+00:00",
+                                    "description": "Test your knowledge of Python basics",
+                                    "due_date": "2025-09-15T23:59:59+00:00",
+                                    "id": "8ff2cdba-fdcc-4ab0-bc95-71db236a4d8c",
+                                    "instructions": [],
+                                    "published_at": null,
+                                    "questions": [
+                                        {
+                                            "correct_answer": "C",
+                                            "created_at": "2025-09-01T03:31:28.091145+00:00",
+                                            "explanation": "Python uses dynamic typing",
+                                            "id": "eec720ec-1c93-4d81-a146-46bf0246fa9e",
+                                            "option_a": "var x = 5",
+                                            "option_b": "int x = 5",
+                                            "option_c": "x = 5",
+                                            "option_d": "declare x = 5",
+                                            "points_weight": 10.0,
+                                            "question_order_idx": "1",
+                                            "question_text": "What is the correct way to declare a variable in Python?",
+                                            "quiz_id": "8ff2cdba-fdcc-4ab0-bc95-71db236a4d8c"
+                                        },
+                                        {
+                                            "correct_answer": "B",
+                                            "created_at": "2025-09-01T03:31:28.091145+00:00",
+                                            "explanation": "** is the exponentiation operator",
+                                            "id": "0c828e0c-7d52-4590-bbd0-ff92c488b2cb",
+                                            "option_a": "^",
+                                            "option_b": "**",
+                                            "option_c": "pow",
+                                            "option_d": "exp",
+                                            "points_weight": 10.0,
+                                            "question_order_idx": "2",
+                                            "question_text": "Which operator is used for exponentiation?",
+                                            "quiz_id": "8ff2cdba-fdcc-4ab0-bc95-71db236a4d8c"
+                                        },
+                                        {
+                                            "correct_answer": "B",
+                                            "created_at": "2025-09-01T03:31:28.091145+00:00",
+                                            "explanation": "3.14 is a floating-point number",
+                                            "id": "8aa7c919-ecf2-4514-9422-8cdceacbfd13",
+                                            "option_a": "int",
+                                            "option_b": "float",
+                                            "option_c": "double",
+                                            "option_d": "decimal",
+                                            "points_weight": 10.0,
+                                            "question_order_idx": "3",
+                                            "question_text": "What data type is 3.14?",
+                                            "quiz_id": "8ff2cdba-fdcc-4ab0-bc95-71db236a4d8c"
+                                        }
+                                    ],
+                                    "randomize_question_order": true,
+                                    "search_vector": "'basic':9 'fundament':2 'knowledg':6 'python':1,8 'quiz':3 'test':4",
+                                    "send_notifications": true,
+                                    "show_results_immediately": false,
+                                    "slug": "python-fundamentals-quiz",
+                                    "status": "draft",
+                                    "time_limit_minutes": 45,
+                                    "title": "Python Fundamentals Quiz",
+                                    "total_points": 30,
+                                    "total_questions": 3,
+                                    "updated_at": "2025-09-01T03:31:29.161155+00:00"
+                                },
+                                "message": "Quiz saved successfully"
+                            }
+                        }
+                    ]
                 }
             },
-            '/api/admin/quizzes/<quiz_id>': {
+            'GET /api/admin/quizzes': {
                 request: {
-                    method:"GET"
-                    
                 },
                 response: {
+                    "data": [
+                        {
+                            "allow_multiple_attempts": false,
+                            "created_at": "2025-08-15T22:11:03.929701+00:00",
+                            "description": "Basic programming concepts in IsiXhosa",
+                            "due_date": "2025-10-30T17:00:00+00:00",
+                            "id": "937d395a-001d-4cd0-b08b-efab7d2bdf29",
+                            "instructions": [
+                                "This quiz contains multiple-choice questions about Python programming",
+                                "Each question has only one correct answer",
+                                "You have 45 minutes to complete all questions",
+                                "You can flag questions for review and return to them later",
+                                "The quiz will auto-submit when time runs out",
+                                "Make sure to submit your quiz before the due date",
+                                "Your score will be calculated based on correct answers",
+                                "Review your answers carefully before final submission"
+                            ],
+                            "published_at": "2025-08-15T23:14:44.045986+00:00",
+                            "randomize_question_order": false,
+                            "search_vector": "'basic':4 'concept':6 'isixhosa':1,8 'program':2,5 'quiz':3",
+                            "send_notifications": false,
+                            "show_results_immediately": true,
+                            "slug": "isixhosa-programming-quiz",
+                            "statistics": {
+                                "attempts_count": 12,
+                                "average_score": 65.0,
+                                "pass_rate": 90.0,
+                                "users_attempted": 10,
+                                "users_passed": 9
+                            },
+                            "status": "published",
+                            "time_limit_minutes": 35,
+                            "title": "IsiXhosa Programming Quiz",
+                            "total_points": 40,
+                            "total_questions": 4,
+                            "updated_at": "2025-08-15T23:14:44.045986+00:00"
+                        },
+                        {
+                            "allow_multiple_attempts": false,
+                            "created_at": "2025-08-22T20:37:18.97661+00:00",
+                            "description": "Master loops and control structures in IsiXhosa programming",
+                            "due_date": "2025-08-30T18:00:00+00:00",
+                            "id": "8892b390-1414-4190-a04d-2a37a6864440",
+                            "instructions": [
+                                "This quiz focuses on loop constructs and control flow in IsiXhosa",
+                                "Pay attention to the different types of loops available",
+                                "Each question tests understanding of control structures",
+                                "You have 20 minutes to complete all questions"
+                            ],
+                            "published_at": "2025-08-22T20:37:20.773465+00:00",
+                            "randomize_question_order": false,
+                            "search_vector": "'control':4,9 'isixhosa':1,12 'loop':2,7 'master':6 'program':13 'quiz':5 'structur':10",
+                            "send_notifications": false,
+                            "show_results_immediately": true,
+                            "slug": "isixhosa-loops-and-control-quiz",
+                            "statistics": {
+                                "attempts_count": 1,
+                                "average_score": 72.0,
+                                "pass_rate": 100.0,
+                                "users_attempted": 1,
+                                "users_passed": 1
+                            },
+                            "status": "published",
+                            "time_limit_minutes": 20,
+                            "title": "IsiXhosa Loops and Control Quiz",
+                            "total_points": 50,
+                            "total_questions": 4,
+                            "updated_at": "2025-08-22T20:37:20.773465+00:00"
+                        },
+                        {
+                            "allow_multiple_attempts": false,
+                            "created_at": "2025-08-22T20:37:46.81194+00:00",
+                            "description": "Understanding boolean values and logical operators in IsiXhosa",
+                            "due_date": "2025-08-30T19:00:00+00:00",
+                            "id": "b0ba3d80-6e43-47f5-8301-483dca4ae050",
+                            "instructions": [
+                                "This quiz tests boolean values and logical operations",
+                                "Focus on truth values and logical operators",
+                                "Understand the difference between True, False, and None",
+                                "You have 18 minutes to complete this quiz"
+                            ],
+                            "published_at": "2025-08-22T20:37:48.453421+00:00",
+                            "randomize_question_order": false,
+                            "search_vector": "'boolean':2,6 'isixhosa':1,12 'logic':3,9 'oper':10 'quiz':4 'understand':5 'valu':7",
+                            "send_notifications": false,
+                            "show_results_immediately": true,
+                            "slug": "isixhosa-boolean-logic-quiz",
+                            "statistics": {
+                                "attempts_count": 1,
+                                "average_score": 0.0,
+                                "pass_rate": 0.0,
+                                "users_attempted": 1,
+                                "users_passed": 0
+                            },
+                            "status": "published",
+                            "time_limit_minutes": 18,
+                            "title": "IsiXhosa Boolean Logic Quiz",
+                            "total_points": 50,
+                            "total_questions": 4,
+                            "updated_at": "2025-08-22T20:37:48.453421+00:00"
+                        },
+                    ],
+                    "filters_applied": {
+                        "limit": 20,
+                        "offset": 0,
+                        "order_by": "created_at",
+                        "order_direction": "asc"
+                    },
+                    "message": "Quizzes retrieved successfully",
+                    "total_count": 3
                 }
             },
-            '/api/admin/quizzes/<quiz_id>': {
+            'GET /api/admin/quizzes/<quiz_id>': {
                 request: {
-                    method:"DELETE"
                     
                 },
                 response: {
+                    "data": {
+                        "allow_multiple_attempts": false,
+                        "created_at": "2025-08-15T22:11:03.929701+00:00",
+                        "description": "Basic programming concepts in IsiXhosa",
+                        "due_date": "2025-10-30T17:00:00+00:00",
+                        "id": "937d395a-001d-4cd0-b08b-efab7d2bdf29",
+                        "instructions": [
+                            "This quiz contains multiple-choice questions about Python programming",
+                            "Each question has only one correct answer",
+                            "You have 45 minutes to complete all questions",
+                            "You can flag questions for review and return to them later",
+                            "The quiz will auto-submit when time runs out",
+                            "Make sure to submit your quiz before the due date",
+                            "Your score will be calculated based on correct answers",
+                            "Review your answers carefully before final submission"
+                        ],
+                        "published_at": "2025-08-15T23:14:44.045986+00:00",
+                        "questions": [
+                            {
+                                "correct_answer": "A",
+                                "created_at": "2025-08-15T22:57:04.64035+00:00",
+                                "explanation": "Kwi-IsiPython, sisebenzisa 'chaza' ukuchaza umsebenzi.",
+                                "id": "2e1210da-3c1f-4291-afe4-792051a2cff7",
+                                "option_a": "chaza",
+                                "option_b": "umsebenzi",
+                                "option_c": "def",
+                                "option_d": "function",
+                                "points_weight": 10.0,
+                                "question_order_idx": "1",
+                                "question_text": "Yintoni i-keyword esisetyenziswayo ukuchaza umsebenzi?",
+                                "quiz_id": "937d395a-001d-4cd0-b08b-efab7d2bdf29"
+                            },
+                            {
+                                "correct_answer": "B",
+                                "created_at": "2025-08-15T22:57:04.64035+00:00",
+                                "explanation": "Kwi-IsiPython, sisebenzisa 'ukuba' ukwenza i-if statement.",
+                                "id": "0d20c6f4-6a6c-4ded-9f4b-8634a8563f15",
+                                "option_a": "if",
+                                "option_b": "ukuba",
+                                "option_c": "condition",
+                                "option_d": "xa",
+                                "points_weight": 10.0,
+                                "question_order_idx": "2",
+                                "question_text": "Yintoni i-keyword ye-conditional statement?",
+                                "quiz_id": "937d395a-001d-4cd0-b08b-efab7d2bdf29"
+                            },
+                            {
+                                "correct_answer": "B",
+                                "created_at": "2025-08-15T22:57:04.64035+00:00",
+                                "explanation": "Kwi-IsiPython, sisebenzisa 'ngexesha' ukwenza i-while loop.",
+                                "id": "242791c3-7dd6-4083-b205-e24553b846f7",
+                                "option_a": "while",
+                                "option_b": "ngexesha",
+                                "option_c": "ngelixa",
+                                "option_d": "loop",
+                                "points_weight": 10.0,
+                                "question_order_idx": "3",
+                                "question_text": "Yintoni i-keyword ye-while loop?",
+                                "quiz_id": "937d395a-001d-4cd0-b08b-efab7d2bdf29"
+                            },
+                            {
+                                "correct_answer": "B",
+                                "created_at": "2025-08-15T22:57:04.64035+00:00",
+                                "explanation": "Kwi-IsiPython, sisebenzisa 'buyisela' ukubuyisela i-value.",
+                                "id": "40bef686-7f93-4850-a10c-de82c0a7c4a9",
+                                "option_a": "return",
+                                "option_b": "buyisela",
+                                "option_c": "give",
+                                "option_d": "back",
+                                "points_weight": 10.0,
+                                "question_order_idx": "4",
+                                "question_text": "Yintoni i-keyword esisetyenziswayo ukubuyisela i-value?",
+                                "quiz_id": "937d395a-001d-4cd0-b08b-efab7d2bdf29"
+                            }
+                        ],
+                        "randomize_question_order": false,
+                        "search_vector": "'basic':4 'concept':6 'isixhosa':1,8 'program':2,5 'quiz':3",
+                        "send_notifications": false,
+                        "show_results_immediately": true,
+                        "slug": "isixhosa-programming-quiz",
+                        "status": "published",
+                        "time_limit_minutes": 35,
+                        "title": "IsiXhosa Programming Quiz",
+                        "total_points": 40,
+                        "total_questions": 4,
+                        "updated_at": "2025-08-15T23:14:44.045986+00:00"
+                    },
+                    "message": "Quiz details retrieved successfully"
+                }
+            },
+            'DELETE /api/admin/quizzes/<quiz_id>': {
+                request: {
+                    
+                },
+                response: {
+                    "message": "Quiz deleted successfully"
                 }
             },
         };
@@ -2086,6 +3214,8 @@
 
             // Find matching example or use generic one
             let example = endpointExamples[endpoint];
+            
+            if (endpoint.includes("admin/challenges") || endpoint.includes("admin/quizzes")) example = endpointExamples[method+' '+endpoint]
             
             // Handle parameterized endpoints
             if (!example) {
