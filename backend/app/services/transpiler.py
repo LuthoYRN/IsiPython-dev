@@ -122,11 +122,32 @@ def validate_isipython_only(source_code: str) -> None:
                 raise ValueError(error_msg)
             
 def _substitute_keywords(line: str) -> str:
-    """Helper: substitute keywords only in code, not comments."""
+    """Helper: substitute keywords only in code, not comments or strings."""
+    # Temporarily replace strings with placeholders
+    import re
+    
+    # Find all string literals
+    strings = []
+    placeholder_line = line
+    
+    # Replace double quotes
+    def replace_string(match):
+        strings.append(match.group(0))
+        return f"__STRING_{len(strings)-1}__"
+    
+    placeholder_line = re.sub(r'"[^"]*"', replace_string, placeholder_line)
+    placeholder_line = re.sub(r"'[^']*'", replace_string, placeholder_line)
+    
+    # Do keyword substitution on placeholder line
     for xhosa_kw, py_kw in KEYWORD_MAP.items():
         if py_kw is not None:
-            line = re.sub(rf'\b{xhosa_kw}\b', py_kw, line)
-    return line
+            placeholder_line = re.sub(rf'\b{xhosa_kw}\b', py_kw, placeholder_line)
+    
+    # Restore original strings
+    for i, original_string in enumerate(strings):
+        placeholder_line = placeholder_line.replace(f"__STRING_{i}__", original_string)
+    
+    return placeholder_line
 
 def _convert_input_calls(code: str, existing_mapping: dict, debug_mode: bool = False,challenge_mode:bool=False) -> tuple[str, dict]:
     """
