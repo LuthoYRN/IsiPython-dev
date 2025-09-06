@@ -30,17 +30,20 @@ class ChallengeTestCase:
             
         # Boolean field validation 
         required_boolean_fields = ['is_hidden', 'is_example']
+        count_true = 0
         for field in required_boolean_fields:
             if field not in data:
                 errors[field] = f"{field.replace('_', ' ').title()} is required"
             elif not isinstance(data[field], bool):
                 errors[field] = f"{field.replace('_', ' ').title()} must be true or false"
-        
+            elif data[field]:
+                count_true+=1
+
+                
         # Logical validation: hidden and example cannot both be true
-        if data.get('is_hidden') and data.get('is_example'):
-            errors['is_hidden'] = "Test case cannot be both hidden and an example"
-            errors['is_example'] = "Test case cannot be both hidden and an example"
-        
+        if count_true==2:
+            errors['both_true'] = "Test case cannot be both hidden and an example"
+            
         return errors
 
     def create(self, challenge_id: str, test_case_data: Dict[str, Any]) -> Dict[str, Any]:
