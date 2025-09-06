@@ -296,7 +296,7 @@ class Quiz:
     def get_quizzes_published_since(self, since_date: datetime) -> Dict[str, Any]:
         """Get quizzes published since a specific date"""
         try:
-            result = supabase.table('quizzes')\
+            result = self.supabase.table('quizzes')\
             .select('*')\
             .eq('status', 'published')\
             .gte('published_at', since_date.isoformat())\
@@ -316,10 +316,13 @@ class Quiz:
                 .delete()\
                 .eq('id', quiz_id)\
                 .execute()
-            self.find_by_id.cache_clear()
-            clear_quiz_dependent_caches()
-            return {"success": True, "message": "Quiz deleted successfully"}
-            
+            if result.data:
+                self.find_by_id.cache_clear()
+                clear_quiz_dependent_caches()
+                return {"success": True, "message": "Quiz deleted successfully"}
+            else:
+                return {"success": False, "error": "quiz not found OR Failed to delete quiz"}
+
         except Exception as e:
             return {"success": False, "error": str(e)}
 
