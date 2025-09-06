@@ -128,7 +128,7 @@ def _execute_single_test(python_code: str, line_mapping: dict, test_case: dict) 
     """
     try:
         test_input_data = test_case["input_data"]
-        expected_output = '\n'.join(line.rstrip() for line in test_case["expected_output"].strip().split('\n'))
+        expected_output = '\n'.join(line.rstrip() for line in test_case["expected_output"].split('\n'))
         
         # Create input string for the program
         input_string = "\n".join(str(item) for item in test_input_data) + "\n"
@@ -156,7 +156,9 @@ def _execute_single_test(python_code: str, line_mapping: dict, test_case: dict) 
                     "english_error":english_error
                 }
         
-        actual_output = (result.get("output") or "").strip()
+        actual_output = result.get("output") or ""
+        actual_output = '\n'.join(line.rstrip() for line in actual_output.split('\n'))
+        actual_output = actual_output.rstrip()
         
         # Compare outputs
         if actual_output == expected_output:
