@@ -293,7 +293,7 @@ class Challenge:
     def get_challenges_published_since(self, since_date: datetime) -> Dict[str, Any]:
         """Get published challenges since a specific date"""
         try:
-            result = supabase.table('challenges')\
+            result = self.supabase.table('challenges')\
             .select('*')\
             .eq('status', 'published')\
             .gte('published_at', since_date.isoformat())\

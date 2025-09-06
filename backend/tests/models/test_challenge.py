@@ -2,6 +2,7 @@ import pytest
 import sys
 from pathlib import Path
 from unittest.mock import patch, Mock
+from datetime import datetime
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from app.models.challenge import Challenge
@@ -518,6 +519,40 @@ class TestChallengeDelete:
         mock_clear_cache.assert_not_called()
         mock_find_by_id.cache_clear.assert_not_called()
 
+class TestChallengePublishedSince:
+    """Test published since functionality."""
+    
+    def setup_method(self):
+        """Set up test fixtures."""
+        self.challenge = Challenge()
+
+    def test_published_since_success(self):
+        """Test successful return."""
+        # Mock the supabase instance
+        mock_supabase = Mock()
+        self.challenge.supabase = mock_supabase
+        since_date = datetime(2025, 9, 1, 0, 0, 0)
+        
+        mock_result = Mock()
+        mock_result.data =  [
+            {'id': '1', 'title': 'Challenge 1', 'status': 'published'},
+            {'id': '2', 'title': 'Challenge 2', 'status': 'published'}
+        ]
+        mock_supabase.table.return_value.select.return_value.eq.return_value.gte.return_value.execute.return_value = mock_result
+        
+        result = self.challenge.get_challenges_published_since(since_date)
+        
+        assert result["success"] is True
+        assert len(result["data"]) == 2
+
+        mock_result = Mock()
+        mock_result.data =  []
+        mock_supabase.table.return_value.select.return_value.eq.return_value.gte.return_value.execute.return_value = mock_result
+        
+        result = self.challenge.get_challenges_published_since(since_date)
+        
+        assert result["success"] is True
+        assert len(result["data"]) == 0
 class TestChallengeHelperMethods:
     """Test challenge helper methods."""
     
