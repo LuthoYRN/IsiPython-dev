@@ -227,22 +227,6 @@ class Challenge:
             clear_challenge_dependent_caches()
             return {"success": False, "error": str(e)}
 
-    def find_by_slug(self, slug: str) -> Dict[str, Any]:
-        """Get challenge by slug"""
-        try:
-            result = self.supabase.table('challenges')\
-                .select('*')\
-                .eq('slug', slug)\
-                .execute()
-            
-            if result.data:
-                return {"success": True, "data": result.data[0]}
-            else:
-                return {"success": False, "error": "Challenge not found"}
-                
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-
     def update(self, challenge_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
         """Update challenge"""
         try:
@@ -329,9 +313,12 @@ class Challenge:
                 .delete()\
                 .eq('id', challenge_id)\
                 .execute()
-            self.find_by_id.cache_clear()
-            clear_challenge_dependent_caches()
-            return {"success": True, "message": "Challenge deleted successfully"}
+            if result.data:
+                self.find_by_id.cache_clear()
+                clear_challenge_dependent_caches()
+                return {"success": True, "message": "Challenge deleted successfully"}
+            else:
+                return {"success": False, "error": "Failed to delete or challenge not found"}
         except Exception as e:
             return {"success": False, "error": str(e)}
         
