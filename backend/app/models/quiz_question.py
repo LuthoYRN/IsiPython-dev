@@ -229,7 +229,7 @@ class QuizQuestion:
                 self.find_by_quiz.cache_clear()
                 return {"success": True, "updated_quiz":quiz,"data": result.data[0]}
             else:
-                return {"success": False, "error": "Failed to update question or question not found"}
+                return {"success": False, "error": "Failed to update question"}
                 
         except Exception as e:
             return {"success": False, "error": str(e)}
