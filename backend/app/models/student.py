@@ -9,7 +9,7 @@ class Student:
     def get_student_count(self) -> Dict[str, Any]:
         """Get number of students in the platform"""
         try:
-            result = supabase.table('profiles').select('id', count='exact').execute()
+            result = self.supabase.table('profiles').select('id', count='exact').execute()
             count = result.count if result.count else 0
             return {"success": True, "count": count}
         except Exception as e:
@@ -18,7 +18,7 @@ class Student:
     def get_students_added_since(self, since_date: datetime) -> Dict[str, Any]:
         """Get count of students created since a specific date"""
         try:
-            result = supabase.table('profiles')\
+            result = self.supabase.table('profiles')\
                 .select('id', count='exact')\
                 .gte('created_at', since_date.isoformat())\
                 .execute()
