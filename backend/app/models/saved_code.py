@@ -85,7 +85,7 @@ class SavedCode:
         
         # Find the highest existing number for this base name
         max_number = 0
-        
+        pattern_match = False
         for existing_title in existing_titles:
                 
             existing_base = existing_title[:-4]  # Remove .isi
@@ -100,9 +100,10 @@ class SavedCode:
                 if match:
                     number = int(match.group(1))
                     max_number = max(max_number, number)
+                    pattern_match = True
         
         # Return next available number
-        return f"{base_name}({max_number + 1}).isi"
+        return f"{base_name}({max_number + 1 if pattern_match else max_number}).isi"
 
     def find_by_user(self, user_id: str) -> Dict[str, Any]:
         """Get all saved code for a specific user"""
@@ -148,15 +149,11 @@ class SavedCode:
             # Validate if title or code are being updated
             if 'title' in updates or 'code' in updates:
                 validation_errors = self.validate_data(
-                    updates.get('title', 'valid'),  # Use placeholder if not updating
+                    updates.get('title', 'valid.isi'),  # Use placeholder if not updating
                     updates.get('code', 'valid')
                 )
                 if validation_errors:
                     return {"success": False, "errors": validation_errors}
-            
-            # Clean title if provided
-            if 'title' in updates:
-                updates['title'] = updates['title'].strip()
 
             current_file = self.supabase.table('saved_code')\
                 .select('title')\
@@ -167,10 +164,13 @@ class SavedCode:
             if not current_file.data:
                 return {"success": False, "error": "File not found or access denied"}
             
-            current_title = current_file.data[0]['title']            
-            new_title = updates['title']
-            if current_title != new_title:
-                updates['title'] = self._get_unique_title(new_title, user_id)
+            # Clean title if provided
+            if 'title' in updates:
+                updates['title'] = updates['title'].strip()
+                current_title = current_file.data[0]['title']            
+                new_title = updates['title']
+                if current_title != new_title:
+                    updates['title'] = self._get_unique_title(new_title, user_id)
                     
             result = self.supabase.table('saved_code')\
                 .update(updates)\
