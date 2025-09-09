@@ -110,7 +110,7 @@ class ChallengeSubmission:
     def count_submissions(self):
         """Get total challenge submissions in the platform"""
         try:
-            result = supabase.table('challenge_submissions').select('id', count='exact').execute()
+            result = self.supabase.table('challenge_submissions').select('id', count='exact').execute()
             count = result.count if result.count else 0
             return {"success": True, "count": count}
         except Exception as e:
@@ -240,7 +240,7 @@ class ChallengeSubmission:
     def get_challenge_submissions_since(self, since_date: datetime) -> Dict[str, Any]:
         """Get challenge submissions since a specific date"""
         try:
-            result = supabase.table('challenge_submissions')\
+            result = self.supabase.table('challenge_submissions')\
             .select('id', count='exact')\
             .gte('submitted_at', since_date.isoformat())\
             .execute()
