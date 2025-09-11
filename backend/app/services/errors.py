@@ -146,7 +146,7 @@ Example 6:
 SyntaxError: invalid syntax - 'else' without matching 'if'
 
 [Correct Translation]
-Igama elithi *enye* alinayo i-statement esithi *ukuba* ehambelanayo kumgca X.
+Igama elithi *enye* alinaso i-statement esithi *ukuba* esihambelanayo kumgca X.
 
 Example 7:
 [Input Error]
@@ -160,7 +160,7 @@ Example 8:
 SyntaxError: invalid syntax - unexpected character
 
 [Correct Translation]
-Kukho uphawu olungaqhelekanga kumgca X. Khangela kakuhle ukuba bonke amagama abhalwe ngendlela efanelekileyo.
+Kukho uphawu olungaqhelekanga kumgca X. Khangela kakuhle ukuba onke amagama abhalwe ngendlela efanelekileyo.
 
 Example 9:
 [Input Error]
