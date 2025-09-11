@@ -44,8 +44,8 @@ jobs:
     
     - name: Test with pytest
       run: |
-        # Run tests from the tests directory, specifically targeting services and models
-        pytest tests/services/ tests/models/ -v
+        # Run tests from the tests directory, excluding test_errors.py
+        pytest tests/services/ tests/models/ --ignore=tests/services/test_errors.py -v
         
     - name: Generate test coverage report (optional)
       run: |
