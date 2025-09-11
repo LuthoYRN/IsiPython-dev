@@ -8,7 +8,10 @@ load_dotenv()
 # Initialize Supabase client
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_SERVICE_KEY") 
-supabase: Client = create_client(supabase_url, supabase_key)
+if supabase_url and supabase_key:
+    supabase: Client = create_client(supabase_url, supabase_key)
+else:
+    supabase = None  
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
