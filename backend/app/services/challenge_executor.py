@@ -158,7 +158,7 @@ def _execute_single_test(python_code: str, line_mapping: dict, test_case: dict) 
         
         actual_output = result.get("output") or ""
         actual_output = '\n'.join(line.rstrip() for line in actual_output.split('\n'))
-        actual_output = actual_output.rstrip()
+        actual_output = actual_output.strip()
         
         # Compare outputs
         if actual_output == expected_output:
