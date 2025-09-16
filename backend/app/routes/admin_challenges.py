@@ -247,12 +247,9 @@ def list_challenges():
             'status': request.args.get('status'),
             'difficulty_level': request.args.get('difficulty'),
             'search': request.args.get('search'),
-            'limit': request.args.get('limit', 20),
-            'offset': request.args.get('offset', 0),
             'order_by': request.args.get('order_by', 'created_at'),
             'order_direction': request.args.get('order_direction', 'desc')
         }
-        
         # Remove None values
         filters = {k: v for k, v in filters.items() if v is not None}
         result = challenge_model.find_all(filters)

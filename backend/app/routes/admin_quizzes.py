@@ -183,8 +183,6 @@ def list_quizzes():
         filters = {
             'status': request.args.get('status'),
             'search': request.args.get('search'),
-            'limit': request.args.get('limit', 20),
-            'offset': request.args.get('offset', 0),
             'order_by': request.args.get('order_by', 'created_at'),
             'order_direction': request.args.get('order_direction', 'desc')
         }

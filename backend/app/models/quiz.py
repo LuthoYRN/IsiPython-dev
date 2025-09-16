@@ -195,15 +195,6 @@ class Quiz:
             else:
                 query = query.order(order_by)
             
-            # Apply pagination
-            if filters and filters.get('limit'):
-                limit = int(filters['limit'])
-                query = query.limit(limit)
-                
-                if filters.get('offset'):
-                    offset = int(filters['offset'])
-                    query = query.offset(offset)
-            
             result = query.execute()
             return {"success": True, "data": result.data}
             
